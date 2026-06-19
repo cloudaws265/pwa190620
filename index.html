@@ -286,50 +286,10 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 .stc-top{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer}
 .st-br{font-size:10px;color:var(--n3);background:#eff6ff;padding:3px 8px;border-radius:6px;font-weight:700;display:inline-block;margin-top:4px}
 
-/* DISTANCE TAB */
-.dv{padding:16px;padding-bottom:120px}
-.dv-warn{background:linear-gradient(135deg,#fffbeb,#fef9c3);border:1px solid #fde68a;border-radius:var(--r);padding:14px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start}
-.dv-warn svg{width:20px;height:20px;color:#d97706;flex-shrink:0;margin-top:1px}
-.dv-warn p{font-size:11px;color:#92400e;line-height:1.7}
-.dc{background:#fff;border-radius:var(--r);padding:20px;box-shadow:var(--s1);border:1px solid var(--gr200);margin-bottom:16px}
-.dc h3{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--gr900);margin-bottom:6px}
-.dc p{font-size:12px;color:var(--gr500);margin-bottom:16px;line-height:1.6}
+/* RETRY BUTTON (reused by data-load error state) */
 .loc-btn{width:100%;padding:14px;border-radius:var(--rs);background:linear-gradient(135deg,var(--n),var(--n3));border:none;color:#fff;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;box-shadow:var(--s2);margin-bottom:12px;font-family:'Inter',sans-serif}
 .loc-btn:active{transform:scale(0.98);opacity:0.9}
 .loc-btn svg{width:18px;height:18px}
-.mloc{display:none;background:var(--gr50);border-radius:var(--rs);padding:12px;border:1px solid var(--gr200)}
-.mloc.show{display:block}
-.nlist{display:none;flex-direction:column;gap:10px}
-.nlist.show{display:flex}
-.nc{background:#fff;border-radius:var(--rs);padding:14px;box-shadow:var(--s1);border:1px solid var(--gr200);display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.2s}
-.nc:active{box-shadow:var(--s2);transform:scale(0.99)}
-.nrk{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800}
-.nrk.g{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff}
-.nrk.s{background:linear-gradient(135deg,#9ca3af,#6b7280);color:#fff}
-.nrk.b{background:linear-gradient(135deg,#cd7c2f,#b45309);color:#fff}
-.nrk.n{background:var(--gr100);color:var(--gr700)}
-.ninfo{flex:1;min-width:0}
-.nname{font-size:13px;font-weight:700;color:var(--gr900)}
-.ndist{font-size:12px;color:var(--n3);font-weight:700;margin-top:2px}
-.naddr{font-size:11px;color:var(--gr500);margin-top:1px}
-.nmap{width:36px;height:36px;border-radius:8px;background:#fff3e0;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#ea580c;flex-shrink:0}
-.nmap svg{width:18px;height:18px}
-.b2bc{background:#fff;border-radius:var(--r);padding:20px;box-shadow:var(--s1);border:1px solid var(--gr200);margin-top:16px}
-.b2bc h3{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--gr900);margin-bottom:16px}
-.b2bs{width:100%;padding:12px 36px 12px 12px;border:1.5px solid var(--gr200);border-radius:var(--rs);font-size:13px;color:var(--gr900);background:#fff;margin-bottom:10px;-webkit-appearance:none;appearance:none;outline:none;cursor:pointer;font-family:'Inter',sans-serif;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
-.b2bs:focus{border-color:var(--n3)}
-.b2bd{display:flex;align-items:center;gap:12px;margin:4px 0}
-.b2bd span{font-size:11px;color:var(--gr500);font-weight:700}
-.b2bd::before,.b2bd::after{content:'';flex:1;height:1px;background:var(--gr200)}
-.b2bb{width:100%;padding:14px;border-radius:var(--rs);background:linear-gradient(135deg,var(--n),var(--n3));border:none;color:#fff;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;box-shadow:var(--s2);font-family:'Inter',sans-serif;transition:all 0.2s}
-.b2bb:active{transform:scale(0.98);opacity:0.9}
-.b2bb svg{width:18px;height:18px}
-.b2br{display:none;margin-top:14px;padding:18px;border-radius:var(--rs);background:var(--gr50);border:1px solid var(--gr200);text-align:center}
-.b2br.show{display:block}
-.b2bv{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--n)}
-.b2bl{font-size:12px;color:var(--gr500);margin-bottom:14px;margin-top:2px}
-.b2bm{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:8px;background:#fff3e0;color:#c2410c;font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:'Inter',sans-serif}
-.b2bm svg{width:16px;height:16px}
 
 /* INSTALL TAB */
 .iv{padding:16px;padding-bottom:120px}
@@ -517,9 +477,6 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
       <button class="tab" onclick="switchTab('heads')" id="tab-heads">
         <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>Heads
       </button>
-      <button class="tab" onclick="switchTab('distance')" id="tab-distance">
-        <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 00-8 8c0 5.25 8 14 8 14s8-8.75 8-14a8 8 0 00-8-8z"/></svg></div>Distance
-      </button>
     </div>
   </div>
 
@@ -559,37 +516,6 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
       <div class="hv" id="headsView"></div>
     </div>
 
-    <!-- DISTANCE TAB -->
-    <div id="view-distance" style="display:none">
-      <div class="dv">
-        <div class="dv-warn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          <p><strong>Distance Disclaimer:</strong> Distances are approximate aerial calculations based on available address data. Accuracy will improve as coordinates are updated. Always verify via Google Maps before travel.</p>
-        </div>
-        <div class="dc">
-          <h3>📍 Nearest Branches</h3>
-          <p>Find branches closest to your current GPS location.</p>
-          <button class="loc-btn" id="locBtn" onclick="findNearest()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 00-8 8c0 5.25 8 14 8 14s8-8.75 8-14a8 8 0 00-8-8z"/></svg>Get My Location
-          </button>
-          <div class="mloc" id="myLocDisplay"><p style="font-size:12px;color:#374151">📍 <strong id="myLocText"></strong></p></div>
-        </div>
-        <div class="nlist" id="nearbyList"></div>
-        <div class="b2bc">
-          <h3>🗺️ Branch to Branch</h3>
-          <select class="b2bs" id="b2bFrom"><option value="">— Select From Branch —</option></select>
-          <div class="b2bd"><span>TO</span></div>
-          <select class="b2bs" id="b2bTo"><option value="">— Select To Branch —</option></select>
-          <button class="b2bb" onclick="calcB2B()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Calculate Distance</button>
-          <div class="b2br" id="b2bResult">
-            <div class="b2bv" id="b2bDist">—</div>
-            <div class="b2bl" id="b2bLabel">aerial distance</div>
-            <button class="b2bm" onclick="openMapsB2B()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Open in Google Maps</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- INSTALL TAB -->
     <div id="view-install" style="display:none">
       <div class="iv">
@@ -604,12 +530,11 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
         </div>
         <div class="iv-note">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <p><strong>Requires internet.</strong> All staff, branch and RO data lives only on our secure server and is fetched fresh every time you open the app — nothing is stored on this device. Distance finder also needs internet for GPS and Google Maps.</p>
+          <p><strong>Requires internet.</strong> All staff, branch and RO data lives only on our secure server and is fetched fresh every time you open the app — nothing is stored on this device.</p>
         </div>
         <div class="iv-about">
           <h3>📋 About & Disclaimer</h3>
           <div class="abox bl"><p>📅 <strong>Data compiled as on: 26-05-2026</strong><br>Any changes in staff, designations or mobile numbers after this date to be updated as and when required.</p></div>
-          <div class="abox am"><p>📍 <strong>Distance Finder Disclaimer:</strong><br>Distances are approximate aerial (straight-line) calculations. Accuracy improves as coordinates are verified. Confirm via Google Maps before travel.</p></div>
           <p style="font-size:11px;color:var(--gr500);text-align:center;margin-top:14px">Created by <strong>GA Section · RO North · Bengaluru</strong></p>
           <p style="text-align:center;margin-top:10px"><a href="admin.html" style="color:var(--gr300);font-size:10px;text-decoration:none;border-bottom:1px dotted var(--gr300);letter-spacing:0.3px">⚙ Admin Login</a></p>
         </div>
@@ -645,10 +570,6 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
     <div class="nico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
     <span>Heads</span>
   </button>
-  <button class="ni" id="nav-distance" onclick="switchTab('distance')">
-    <div class="nico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 00-8 8c0 5.25 8 14 8 14s8-8.75 8-14a8 8 0 00-8-8z"/></svg></div>
-    <span>Distance</span>
-  </button>
 </div>
 
 <div id="toast"></div>
@@ -659,7 +580,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ═══ GLOBALS ═══
-let cTab='ro',cFilter='all',sQ='',myLL=null,b2bFC=null,b2bTC=null,b2bFN='',b2bTN='';
+let cTab='ro',cFilter='all',sQ='';
 let COORDS={};
 
 // ═══ DATA LOADING (Supabase — fetched live, never cached or stored on-device) ═══
@@ -784,7 +705,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
   setTimeout(()=>{
     document.getElementById('app').style.display='flex';
     if(status){
-      renderRO();renderBranches();renderStaff();renderHeads();populateB2B();
+      renderRO();renderBranches();renderStaff();renderHeads();
     } else {
       document.getElementById('roView').innerHTML='<div style="padding:60px 32px;text-align:center"><div style="font-size:48px;margin-bottom:16px">📡</div><h3 style="font-family:\'Playfair Display\',serif;font-size:17px;font-weight:700;color:var(--gr700);margin-bottom:8px">Could not load directory</h3><p style="font-size:13px;color:var(--gr500)">Check your internet connection, then tap below to retry.</p><button class="loc-btn" style="margin-top:18px;max-width:220px" onclick="location.reload()">Retry</button></div>';
     }
@@ -812,7 +733,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
 
 
 // TAB SWITCH
-const ALL_TABS=['ro','branches','staff','heads','distance','install'];
+const ALL_TABS=['ro','branches','staff','heads','install'];
 function switchTab(t,silent){
   cTab=t;
   ALL_TABS.forEach(v=>{
@@ -997,56 +918,7 @@ function renderHeads(){_siCounter=0;
   hv.innerHTML=html;
 }
 
-// DISTANCE
-function hav(a,b,c,d){const R=6371,dL=(c-a)*Math.PI/180,dl=(d-b)*Math.PI/180,x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dl/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
-function findNearest(){
-  showToast('⚠️ Aerial estimates — road distance may vary');
-  const btn=document.getElementById('locBtn');
-  btn.style.opacity='0.7';btn.style.pointerEvents='none';
-  btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;animation:spin 1s linear infinite"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> Locating…';
-  if(!document.getElementById('ss')){const s=document.createElement('style');s.id='ss';s.textContent='@keyframes spin{to{transform:rotate(360deg)}}';document.head.appendChild(s)}
-  if(!navigator.geolocation){showToast('GPS not supported');resetLB();return}
-  navigator.geolocation.getCurrentPosition(pos=>{
-    myLL=[pos.coords.latitude,pos.coords.longitude];resetLB('📍 Refresh Location');
-    const d=document.getElementById('myLocDisplay');d.classList.add('show');
-    document.getElementById('myLocText').textContent=`${myLL[0].toFixed(4)}, ${myLL[1].toFixed(4)}`;
-    const res=[];DIRECTORY_DATA.branches.forEach(b=>{const c=COORDS[b.dpcd];if(c)res.push({b,dist:hav(myLL[0],myLL[1],c[0],c[1])})});
-    res.sort((a,b)=>a.dist-b.dist);
-    const nl=document.getElementById('nearbyList');nl.classList.add('show');
-    nl.innerHTML=res.slice(0,10).map((r,i)=>{
-      const rc=i===0?'g':i===1?'s':i===2?'b':'n';
-      const ds=r.dist<1?`${(r.dist*1000).toFixed(0)} m`:`${r.dist.toFixed(1)} km`;
-      return`<div class="nc" onclick="openBranchMap('${r.b.dpcd}')">
-        <div class="nrk ${rc}">${i+1}</div>
-        <div class="ninfo"><div class="nname">${r.b.name}</div><div class="ndist">📍 ${ds} away</div>${r.b.address?`<div class="naddr">${r.b.address}</div>`:''}</div>
-        <button class="nmap" onclick="event.stopPropagation();openBranchMap('${r.b.dpcd}')">${mpSvg}</button>
-      </div>`;
-    }).join('');
-    showToast(`${Math.min(res.length,10)} nearest branches found`);
-  },()=>{resetLB();showToast('Location denied. Please allow GPS.')},{timeout:10000,enableHighAccuracy:true});
-}
-function resetLB(t='Get My Location'){
-  const btn=document.getElementById('locBtn');btn.style.opacity='1';btn.style.pointerEvents='auto';
-  btn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 00-8 8c0 5.25 8 14 8 14s8-8.75 8-14a8 8 0 00-8-8z"/></svg> ${t}`;
-}
-function populateB2B(){
-  const f=document.getElementById('b2bFrom'),t=document.getElementById('b2bTo');
-  DIRECTORY_DATA.branches.forEach(b=>{if(COORDS[b.dpcd]){const o=`<option value="${b.dpcd}">${b.name}</option>`;f.innerHTML+=o;t.innerHTML+=o}});
-}
-function calcB2B(){
-  const fv=document.getElementById('b2bFrom').value,tv=document.getElementById('b2bTo').value;
-  if(!fv||!tv){showToast('Select both branches');return}
-  if(fv===tv){showToast('Select different branches');return}
-  const c1=COORDS[fv],c2=COORDS[tv];if(!c1||!c2){showToast('Coordinates not available');return}
-  b2bFC=c1;b2bTC=c2;
-  b2bFN=document.getElementById('b2bFrom').options[document.getElementById('b2bFrom').selectedIndex].text;
-  b2bTN=document.getElementById('b2bTo').options[document.getElementById('b2bTo').selectedIndex].text;
-  const d=hav(c1[0],c1[1],c2[0],c2[1]);
-  document.getElementById('b2bDist').textContent=d<1?`${(d*1000).toFixed(0)} m`:`${d.toFixed(2)} km`;
-  document.getElementById('b2bLabel').textContent=`${b2bFN} → ${b2bTN}`;
-  document.getElementById('b2bResult').classList.add('show');
-}
-function openMapsB2B(){if(!b2bFC||!b2bTC)return;window.open(`https://www.google.com/maps/dir/${b2bFC[0]},${b2bFC[1]}/${b2bTC[0]},${b2bTC[1]}`,'_blank')}
+// MAPS (still used by Branches tab cards)
 function openBranchMap(d){const c=COORDS[d];if(!c){showToast('Location not available');return}window.open(`https://www.google.com/maps/search/?api=1&query=${c[0]},${c[1]}`,'_blank')}
 
 // ACTIONS

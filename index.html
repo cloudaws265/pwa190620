@@ -271,7 +271,6 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 .act-btn:active{transform:scale(0.93);filter:brightness(0.9)}
 .act-btn.call{background:#e8f0fe;color:#1a56db}.act-btn.call .aico{background:#1a56db}.act-btn.call .aico svg{color:#fff}
 .act-btn.wa{background:#dcfce7;color:#15803d}.act-btn.wa .aico{background:#16a34a}.act-btn.wa .aico svg{color:#fff}
-.act-btn.map{background:#fff3e0;color:#c2410c}.act-btn.map .aico{background:#ea580c}.act-btn.map .aico svg{color:#fff}
 .bc-staff{display:none;background:#fff}
 .bcard.open .bc-staff{display:block}
 
@@ -393,8 +392,8 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
     </button>
     <button class="sp-enter-btn" id="splashEnterBtn" onclick="dismissSplash()">Enter Directory →</button>
   </div>
-  <div class="sp-disc"><p>⚠️ Compiled as on <strong>26-05-2026</strong>. Any changes on later date to be updated as and when required.</p></div>
-  <div class="sp-foot">Created by GA Section · RO North · Bengaluru<br><span style="opacity:0.6">Data as on 26-05-2026</span></div>
+  <div class="sp-disc"><p>⚠️ Compiled as on <strong>05-06-2026</strong>. Any changes on later date to be updated as and when required.</p></div>
+  <div class="sp-foot">Pawan Singh · RO North · Bengaluru<br><span style="opacity:0.6">Data as on 05-06-2026</span></div>
 </div>
 
 <!-- INSTALL POPUP -->
@@ -534,8 +533,8 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
         </div>
         <div class="iv-about">
           <h3>📋 About & Disclaimer</h3>
-          <div class="abox bl"><p>📅 <strong>Data compiled as on: 26-05-2026</strong><br>Any changes in staff, designations or mobile numbers after this date to be updated as and when required.</p></div>
-          <p style="font-size:11px;color:var(--gr500);text-align:center;margin-top:14px">Created by <strong>GA Section · RO North · Bengaluru</strong></p>
+          <div class="abox bl"><p>📅 <strong>Data compiled as on: 05-06-2026</strong><br>Any changes in staff, designations or mobile numbers after this date to be updated as and when required.</p></div>
+          <p style="font-size:11px;color:var(--gr500);text-align:center;margin-top:14px">Pawan Singh <strong>· RO North · Bengaluru</strong></p>
           <p style="text-align:center;margin-top:10px"><a href="admin.html" style="color:var(--gr300);font-size:10px;text-decoration:none;border-bottom:1px dotted var(--gr300);letter-spacing:0.3px">⚙ Admin Login</a></p>
         </div>
       </div>
@@ -581,7 +580,6 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ═══ GLOBALS ═══
 let cTab='ro',cFilter='all',sQ='';
-let COORDS={};
 
 // ═══ DATA LOADING (Supabase — fetched live, never cached or stored on-device) ═══
 async function loadDirectoryData(){
@@ -602,17 +600,14 @@ async function loadDirectoryData(){
         isBranchHead:s.is_branch_head?'yes':'no'
       });
     });
-    const newCoords={};
-    const branches=(brRes.data||[]).map(b=>{
-      if(b.lat!=null&&b.lng!=null)newCoords[b.dpcd]=[Number(b.lat),Number(b.lng)];
-      return{dpcd:b.dpcd,name:b.name,address:b.address||'',ifsc:b.ifsc||'',landline:b.landline||'',cugMobile:b.cug_mobile||'',staff:staffByBranch[b.id]||[]};
-    });
+    const branches=(brRes.data||[]).map(b=>({
+      dpcd:b.dpcd,name:b.name,address:b.address||'',ifsc:b.ifsc||'',landline:b.landline||'',cugMobile:b.cug_mobile||'',staff:staffByBranch[b.id]||[]
+    }));
     const roOfficials=(roRes.data||[]).map(o=>({
       staffNo:o.staff_no,name:o.name,designation:o.designation,mobile:o.mobile,email:o.email,
       section:o.section||'No Section',isBranchHead:o.is_head||''
     }));
     DIRECTORY_DATA={roOfficials,branches};
-    COORDS=newCoords;
     return true;
   }catch(err){
     console.error('Directory load failed',err);
@@ -628,7 +623,6 @@ function ini(n){if(!n)return'?';const p=n.trim().split(' ');return(p.length===1?
 const cSvg=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>`;
 const wSvg=`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;
 const mSvg=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>`;
-const mpSvg=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>`;
 
 // PARTICLES
 function initPts(){
@@ -816,7 +810,7 @@ function toggleContact(uid){
 }
 
 // RENDER RO
-function renderRO(){_siCounter=0;
+function renderRO(){
   const rv=document.getElementById('roView');
   let officials=[...DIRECTORY_DATA.roOfficials];
   if(sQ)officials=officials.filter(o=>o.name.toLowerCase().includes(sQ)||o.designation.toLowerCase().includes(sQ)||o.section.toLowerCase().includes(sQ)||o.staffNo.includes(sQ));
@@ -830,7 +824,7 @@ function renderRO(){_siCounter=0;
 }
 
 // RENDER BRANCHES
-function renderBranches(){_siCounter=0;
+function renderBranches(){
   const list=document.getElementById('branchList'),empty=document.getElementById('branchEmpty'),cnt=document.getElementById('branchCount');
   let branches=[...DIRECTORY_DATA.branches];
   if(sQ)branches=branches.filter(b=>b.name.toLowerCase().includes(sQ)||b.address.toLowerCase().includes(sQ)||b.staff.some(s=>s.name.toLowerCase().includes(sQ)||s.designation.toLowerCase().includes(sQ)||s.staffNo.includes(sQ)));
@@ -841,7 +835,6 @@ function renderBranches(){_siCounter=0;
   list.innerHTML=branches.map((b,i)=>{
     const head=b.staff.find(s=>s.isBranchHead==='yes')||b.staff[0];
     const cug=b.cugMobile||'';
-    const hasMap=!!COORDS[b.dpcd];
     return`<div class="bcard" id="bc-${b.dpcd}" style="animation-delay:${Math.min(i*0.03,0.4)}s">
       <div class="bc-hero" onclick="toggleBranch('${b.dpcd}')">
         <div class="bc-glow1"></div><div class="bc-glow2"></div>
@@ -862,10 +855,9 @@ function renderBranches(){_siCounter=0;
         </div>
         <div class="bc-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
       </div>
-      ${(cug||hasMap)?`<div class="bc-cug">
-        ${cug?`<button class="act-btn call" onclick="callNum('${cug}')"><div class="aico">${cSvg}</div>CUG Call</button>`:''}
-        ${cug?`<button class="act-btn wa" onclick="waNum('${cug}')"><div class="aico">${wSvg}</div>WhatsApp</button>`:''}
-        ${hasMap?`<button class="act-btn map" onclick="openBranchMap('${b.dpcd}')"><div class="aico">${mpSvg}</div>Maps</button>`:''}
+      ${cug?`<div class="bc-cug">
+        <button class="act-btn call" onclick="callNum('${cug}')"><div class="aico">${cSvg}</div>CUG Call</button>
+        <button class="act-btn wa" onclick="waNum('${cug}')"><div class="aico">${wSvg}</div>WhatsApp</button>
       </div>`:''}
       <div class="bc-staff">${b.staff.map(s=>staffItem(s,false)).join('')}</div>
     </div>`;
@@ -880,7 +872,7 @@ function toggleBranch(dpcd){
 }
 
 // RENDER STAFF
-function renderStaff(){_siCounter=0;
+function renderStaff(){
   const list=document.getElementById('staffList'),empty=document.getElementById('staffEmpty'),cnt=document.getElementById('staffCount');
   let all=[];DIRECTORY_DATA.branches.forEach(b=>b.staff.forEach(s=>all.push({...s,bn:b.name})));
   if(sQ)all=all.filter(s=>s.name.toLowerCase().includes(sQ)||s.designation.toLowerCase().includes(sQ)||s.staffNo.includes(sQ)||s.bn.toLowerCase().includes(sQ));
@@ -894,7 +886,7 @@ function renderStaff(){_siCounter=0;
 }
 
 // RENDER HEADS
-function renderHeads(){_siCounter=0;
+function renderHeads(){
   const hv=document.getElementById('headsView');
   // Branch heads
   let branchHeads=[];
@@ -917,9 +909,6 @@ function renderHeads(){_siCounter=0;
   }
   hv.innerHTML=html;
 }
-
-// MAPS (still used by Branches tab cards)
-function openBranchMap(d){const c=COORDS[d];if(!c){showToast('Location not available');return}window.open(`https://www.google.com/maps/search/?api=1&query=${c[0]},${c[1]}`,'_blank')}
 
 // ACTIONS
 function callNum(n){if(!n)return;window.location.href='tel:+91'+n.replace(/\D/g,'').slice(-10)}

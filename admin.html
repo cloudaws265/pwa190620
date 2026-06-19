@@ -519,7 +519,7 @@ function openBranchModal(b){
     <div class="field"><label>CUG Mobile</label><input id="m_cug" value="${esc(b?.cug_mobile||'')}" placeholder="10-digit CUG mobile"></div>
     <div class="field"><label>Latitude</label><input id="m_lat" value="${b?.lat??''}" placeholder="e.g. 13.2776"></div>
     <div class="field"><label>Longitude</label><input id="m_lng" value="${b?.lng??''}" placeholder="e.g. 77.6882"></div>
-    <div class="hint">Latitude/longitude power the Distance Finder tab — leave blank if unknown.</div>
+    <div class="hint">Latitude/longitude are used by the separate Branch Distance Finder app — leave blank if unknown.</div>
     <div class="field"><label>Display order</label><input id="m_order" type="number" value="${b?.display_order ?? DATA.branches.length}"></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="m_cancel" style="flex:1;">Cancel</button>

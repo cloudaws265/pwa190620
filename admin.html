@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#001233">
+<title>Admin · Canara Connect North RO</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{
+  --n:#001233;--n2:#002366;--n3:#003087;--n4:#0044bb;
+  --g:#F5A623;--g2:#FFD166;--g3:#d4880a;
+  --w:#fff;
+  --gr50:#f8f9fa;--gr100:#f0f2f5;--gr200:#e0e4ea;--gr300:#c8cfd8;
+  --gr400:#9aa3b0;--gr500:#6b7280;--gr700:#374151;--gr900:#111827;
+  --s1:0 2px 8px rgba(0,48,135,0.10);--s2:0 4px 20px rgba(0,48,135,0.16);--s3:0 8px 40px rgba(0,48,135,0.22);
+  --sg:0 4px 16px rgba(245,166,35,0.35);
+  --r:16px;--rs:10px;
+  --ok:#16a34a;--err:#dc2626;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--gr100);color:var(--gr900)}
+button,input,select{font-family:inherit}
+
+/* ===== LOGIN ===== */
+#loginScreen{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(0,68,187,0.5),transparent 60%) , var(--n);padding:20px}
+.login-card{background:#fff;border-radius:22px;padding:34px 26px;width:100%;max-width:360px;box-shadow:var(--s3);
+  text-align:center;animation:cardIn .5s cubic-bezier(.22,.61,.36,1) both}
+@keyframes cardIn{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.login-icon{width:64px;height:64px;margin:0 auto 16px;border-radius:18px;background:linear-gradient(135deg,var(--g3),var(--g));
+  display:flex;align-items:center;justify-content:center;box-shadow:var(--sg)}
+.login-icon svg{width:30px;height:30px;color:var(--n)}
+.login-card h1{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--n2);margin-bottom:4px}
+.login-card p{font-size:12.5px;color:var(--gr500);margin-bottom:22px}
+.field{margin-bottom:14px;text-align:left}
+.field input,.field select{width:100%;padding:13px 14px;border-radius:12px;border:1.5px solid var(--gr200);font-size:14px;
+  outline:none;transition:all .2s;background:var(--gr50)}
+.field input:focus,.field select:focus{border-color:var(--n3);box-shadow:0 0 0 3px rgba(0,48,135,.08);background:#fff}
+.btn{width:100%;padding:13px;border-radius:12px;border:none;font-weight:800;font-size:14px;cursor:pointer;
+  transition:all .15s;font-family:'Inter',sans-serif}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,var(--n2),var(--n3));color:#fff;box-shadow:var(--s2)}
+.btn-gold{background:linear-gradient(135deg,var(--g3),var(--g));color:var(--n)}
+.btn-ghost{background:var(--gr100);color:var(--n2)}
+.btn-danger{background:#fef2f2;color:var(--err)}
+.shake{animation:shake .4s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+.login-err{color:var(--err);font-size:12px;margin-top:-4px;margin-bottom:12px;min-height:14px}
+.back-link{display:inline-block;margin-top:18px;color:var(--gr500);font-size:12px;text-decoration:none}
+
+/* ===== APP SHELL ===== */
+#adminApp{display:none;max-width:820px;margin:0 auto;min-height:100vh;padding-bottom:40px}
+header.topbar{background:linear-gradient(180deg,#000e2a 0%,var(--n2) 100%);padding:16px 18px;
+  display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:40;box-shadow:0 2px 20px rgba(0,0,0,.3)}
+.topbar .ttl{flex:1;min-width:0}
+.topbar .ttl .t1{font-family:'Playfair Display',serif;font-weight:700;font-size:17px;color:#fff}
+.topbar .ttl .t2{font-size:10.5px;color:var(--g);text-transform:uppercase;letter-spacing:1.2px;margin-top:1px}
+.icon-btn{width:36px;height:36px;border-radius:10px;border:none;background:rgba(255,255,255,.1);color:#fff;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0}
+.icon-btn:active{transform:scale(.9);background:rgba(255,255,255,.2)}
+.icon-btn svg{width:17px;height:17px}
+a.applink{color:var(--g);text-decoration:none;font-size:11.5px;font-weight:700;flex-shrink:0}
+
+.tabs{display:flex;gap:6px;padding:14px 16px 0;overflow-x:auto}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:9px 16px;border-radius:30px;border:1.5px solid var(--gr200);background:#fff;
+  font-size:12.5px;font-weight:700;color:var(--gr500);cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0}
+.tab.active{background:linear-gradient(135deg,var(--n2),var(--n3));color:#fff;border-color:transparent;box-shadow:var(--s1)}
+
+#panelArea{padding:16px}
+.panel{animation:fadeUp .35s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.toolbar{display:flex;gap:10px;margin-bottom:14px;align-items:center}
+.search-box{flex:1;display:flex;align-items:center;gap:8px;background:#fff;border-radius:30px;padding:10px 15px;
+  box-shadow:var(--s1);border:1px solid var(--gr200)}
+.search-box svg{width:15px;height:15px;color:var(--gr400);flex-shrink:0}
+.search-box input{border:none;outline:none;background:transparent;flex:1;font-size:13px}
+.btn-add{background:linear-gradient(135deg,var(--g3),var(--g));color:var(--n);border:none;border-radius:30px;
+  padding:10px 16px;font-weight:800;font-size:12.5px;display:flex;align-items:center;gap:6px;cursor:pointer;
+  flex-shrink:0;box-shadow:var(--sg);transition:transform .15s}
+.btn-add:active{transform:scale(.94)}
+.btn-add svg{width:14px;height:14px}
+
+.data-card{background:#fff;border-radius:14px;padding:13px 14px;margin-bottom:9px;box-shadow:var(--s1);
+  border:1px solid var(--gr200);display:flex;align-items:center;gap:12px;animation:rowIn .35s ease both}
+@keyframes rowIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.dc-icon{width:40px;height:40px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--n2),var(--n3));color:#fff;font-weight:800;font-size:12px}
+.dc-body{flex:1;min-width:0}
+.dc-title{font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dc-sub{font-size:11.5px;color:var(--gr500);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dc-actions{display:flex;gap:6px;flex-shrink:0}
+.dc-act{width:32px;height:32px;border-radius:9px;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s}
+.dc-act:active{transform:scale(.88)}
+.dc-act svg{width:14px;height:14px}
+.dc-edit{background:#eaf0fb;color:var(--n2)}
+.dc-staff{background:#fff7e8;color:var(--g3)}
+.dc-del{background:#fef2f2;color:var(--err)}
+.head-tag{background:linear-gradient(135deg,var(--g3),var(--g));color:var(--n);font-size:9px;font-weight:800;
+  padding:2px 6px;border-radius:20px;text-transform:uppercase;margin-left:6px}
+
+.empty-state{text-align:center;padding:48px 20px;color:var(--gr500)}
+.empty-state svg{width:42px;height:42px;color:var(--gr300);margin-bottom:10px}
+.empty-state .e1{font-weight:700;font-size:14px;color:var(--gr900);margin-bottom:3px;font-family:'Playfair Display',serif}
+
+.skel{background:linear-gradient(90deg,#eceff5 25%,#f6f7fb 37%,#eceff5 63%);background-size:400% 100%;
+  animation:shimmer 1.4s ease infinite;border-radius:14px;height:60px;margin-bottom:9px}
+@keyframes shimmer{0%{background-position:100% 50%}100%{background-position:0 50%}}
+
+/* breadcrumb for branch staff view */
+.crumb{display:flex;align-items:center;gap:8px;margin-bottom:14px;background:#fff;border-radius:14px;
+  padding:12px 14px;box-shadow:var(--s1);border:1px solid var(--gr200)}
+.crumb button{background:var(--gr100);border:none;border-radius:9px;width:32px;height:32px;display:flex;
+  align-items:center;justify-content:center;cursor:pointer;color:var(--n2);flex-shrink:0}
+.crumb button svg{width:15px;height:15px}
+.crumb .ctitle{font-family:'Playfair Display',serif;font-weight:700;font-size:14.5px;color:var(--n2)}
+.crumb .csub{font-size:11px;color:var(--gr500)}
+
+/* ===== MODAL ===== */
+#modalBackdrop{position:fixed;inset:0;background:rgba(0,16,38,.6);z-index:200;display:none;
+  align-items:flex-end;justify-content:center}
+#modalBackdrop.open{display:flex;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:#fff;width:100%;max-width:480px;border-radius:24px 24px 0 0;padding:22px 20px 28px;
+  max-height:88vh;overflow-y:auto;transform:translateY(100%);transition:transform .32s cubic-bezier(.22,.61,.36,1)}
+#modalBackdrop.open .modal{transform:translateY(0)}
+.modal-handle{width:38px;height:4px;background:var(--gr200);border-radius:4px;margin:0 auto 16px}
+.modal h2{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:16px;color:var(--n2)}
+.field label{display:block;font-size:11px;font-weight:700;color:var(--gr500);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.checkrow{display:flex;align-items:center;gap:9px;margin-bottom:14px}
+.checkrow input{width:18px;height:18px;accent-color:var(--n2)}
+.checkrow label{font-size:13px;font-weight:600}
+.modal-actions{display:flex;gap:10px;margin-top:18px}
+.hint{font-size:11px;color:var(--gr400);margin:-8px 0 14px;line-height:1.5}
+
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--n);color:#fff;padding:11px 20px;border-radius:30px;font-size:12.5px;
+  opacity:0;transition:all .3s;z-index:300;pointer-events:none;box-shadow:var(--s3);
+  display:flex;align-items:center;gap:6px;max-width:90%}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.err{background:#7f1d1d}
+#toast svg{width:14px;height:14px;color:var(--g);flex-shrink:0}
+::-webkit-scrollbar{width:0;height:0}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-card" id="loginCard">
+    <div class="login-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+    <h1>Admin Access</h1>
+    <p>Canara Connect · North Regional Office</p>
+    <div class="field"><input id="pwInput" type="password" placeholder="Enter admin password" autocomplete="current-password"></div>
+    <div class="login-err" id="loginErr"></div>
+    <button class="btn btn-primary" id="loginBtn">Unlock Admin Panel</button>
+    <a class="back-link" href="index.html">← Back to directory</a>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<div id="adminApp">
+  <header class="topbar">
+    <div class="ttl">
+      <div class="t1">Admin Panel</div>
+      <div class="t2">Canara Connect · North RO</div>
+    </div>
+    <a class="applink" href="index.html">View App</a>
+    <button class="icon-btn" id="logoutBtn" title="Logout">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
+    </button>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="ro">RO Officials</div>
+    <div class="tab" data-tab="branches">Branches</div>
+    <div class="tab" data-tab="settings">Settings</div>
+  </div>
+
+  <div id="panelArea"></div>
+</div>
+
+<div id="modalBackdrop">
+  <div class="modal" id="modalBody"></div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://ffbyevyaghwhudeunadc.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmYnlldnlhZ2h3aHVkZXVuYWRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Nzc5NDgsImV4cCI6MjA5NzI1Mzk0OH0.LeRflHXlrkYKvJBwVdWh19FRMR19Slhtdj1Sd7wGj1s';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const AUTH_KEY = 'ccnro_admin_auth';
+
+const SECTION_LIST = ['No Section','Advances & Gen Administration Section','Audit & Compliance',
+  'Business Planning & Resources','Cr Administration & Monitoring','Financial Inclusion Section',
+  'H R & P R Section','Operations Section','Recovery, Legal, Fraud Prevention Section','Technology Services Section'];
+
+let DATA = { ro: [], branches: [] };
+let activeTab = 'ro';
+let activeBranch = null; // when viewing a branch's staff list
+
+function esc(s){
+  if(s===null||s===undefined) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function ini(n){if(!n)return'?';const p=n.trim().split(' ');return(p.length===1?p[0][0]:p[0][0]+p[p.length-1][0]).toUpperCase()}
+function toast(msg, isErr){
+  const t = document.getElementById('toast');
+  t.className = isErr ? 'err' : '';
+  t.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="${isErr?'M12 9v4M12 17h.01M10.3 3.9 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z':'M20 6 9 17l-5-5'}"/></svg><span>${esc(msg)}</span>`;
+  t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ===== LOGIN ===== */
+const loginScreen = document.getElementById('loginScreen');
+const adminApp = document.getElementById('adminApp');
+const pwInput = document.getElementById('pwInput');
+
+async function tryLogin(){
+  const pw = pwInput.value.trim();
+  if(!pw){ showLoginErr('Enter the admin password'); return; }
+  const btn = document.getElementById('loginBtn');
+  btn.textContent = 'Checking…';
+  try{
+    const { data, error } = await sb.rpc('verify_admin_password', { input_password: pw });
+    if(error) throw error;
+    if(data === true){
+      localStorage.setItem(AUTH_KEY, 'true');
+      enterApp();
+    } else {
+      showLoginErr('Incorrect password');
+    }
+  }catch(e){
+    console.error(e);
+    showLoginErr('Could not verify — check connection');
+  }
+  btn.textContent = 'Unlock Admin Panel';
+}
+function showLoginErr(msg){
+  document.getElementById('loginErr').textContent = msg;
+  const card = document.getElementById('loginCard');
+  card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+}
+document.getElementById('loginBtn').onclick = tryLogin;
+pwInput.addEventListener('keydown', e => { if(e.key === 'Enter') tryLogin(); });
+document.getElementById('logoutBtn').onclick = () => { localStorage.removeItem(AUTH_KEY); location.reload(); };
+
+async function enterApp(){
+  loginScreen.style.display = 'none';
+  adminApp.style.display = 'block';
+  await loadAll();
+  renderTab('ro');
+}
+if(localStorage.getItem(AUTH_KEY) === 'true'){ enterApp(); }
+
+/* ===== DATA ===== */
+async function loadAll(){
+  document.getElementById('panelArea').innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
+  const [roRes, brRes, stRes] = await Promise.all([
+    sb.from('ro_officials').select('*').order('display_order'),
+    sb.from('branches').select('*').order('display_order'),
+    sb.from('branch_staff').select('*').order('display_order')
+  ]);
+  const staffByBranch = {};
+  (stRes.data||[]).forEach(s=>{ (staffByBranch[s.branch_id]=staffByBranch[s.branch_id]||[]).push(s); });
+  DATA.ro = roRes.data || [];
+  DATA.branches = (brRes.data||[]).map(b=>({...b, staff: staffByBranch[b.id]||[]}));
+}
+
+/* ===== TABS ===== */
+document.querySelectorAll('.tab').forEach(t=>{ t.onclick = () => { activeBranch=null; renderTab(t.dataset.tab); }; });
+function renderTab(tab){
+  activeTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  const area = document.getElementById('panelArea');
+  if(tab === 'ro') area.innerHTML = roPanel();
+  if(tab === 'branches') area.innerHTML = activeBranch ? branchStaffPanel(activeBranch) : branchesPanel();
+  if(tab === 'settings') area.innerHTML = settingsPanel();
+  bindPanelEvents(tab);
+}
+
+/* ===== RO OFFICIALS PANEL ===== */
+function roPanel(filter=''){
+  const f = filter.trim().toLowerCase();
+  const rows = DATA.ro.filter(o => !f || [o.name,o.designation,o.staff_no,o.section].some(v=>v&&String(v).toLowerCase().includes(f)));
+  return `<div class="panel">
+    <div class="toolbar">
+      <div class="search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input id="roFilter" placeholder="Search RO officials…" value="${esc(filter)}"></div>
+      <button class="btn-add" id="addRoBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>Add</button>
+    </div>
+    <div id="roRows">${rows.length ? rows.map(roRowHtml).join('') : emptyHtml('No RO officials','Add an official to get started.')}</div>
+  </div>`;
+}
+function roRowHtml(o){
+  return `<div class="data-card">
+    <div class="dc-icon">${ini(o.name)}</div>
+    <div class="dc-body"><div class="dc-title">${esc(o.name)}${o.is_head?'<span class="head-tag">'+esc(o.is_head)+'</span>':''}</div>
+      <div class="dc-sub">${esc(o.designation||'')} · ${esc(o.section||'No Section')}</div></div>
+    <div class="dc-actions">
+      <button class="dc-act dc-edit" data-edit-ro="${o.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg></button>
+      <button class="dc-act dc-del" data-del-ro="${o.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6h16Z"/></svg></button>
+    </div>
+  </div>`;
+}
+
+/* ===== BRANCHES PANEL ===== */
+function branchesPanel(filter=''){
+  const f = filter.trim().toLowerCase();
+  const rows = DATA.branches.filter(b => !f || b.name.toLowerCase().includes(f) || String(b.dpcd||'').includes(f));
+  return `<div class="panel">
+    <div class="toolbar">
+      <div class="search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input id="brFilter" placeholder="Search branches…" value="${esc(filter)}"></div>
+      <button class="btn-add" id="addBrBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>Add</button>
+    </div>
+    <div id="brRows">${rows.length ? rows.map(brRowHtml).join('') : emptyHtml('No branches','Add a branch to get started.')}</div>
+  </div>`;
+}
+function brRowHtml(b){
+  const head = b.staff.find(s=>s.is_branch_head) || b.staff[0];
+  return `<div class="data-card">
+    <div class="dc-icon">${esc(b.dpcd)}</div>
+    <div class="dc-body"><div class="dc-title">${esc(b.name)}</div>
+      <div class="dc-sub">${b.staff.length} staff${head?' · Head: '+esc(head.name):''}</div></div>
+    <div class="dc-actions">
+      <button class="dc-act dc-staff" data-view-staff="${b.id}" title="Manage staff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></button>
+      <button class="dc-act dc-edit" data-edit-br="${b.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg></button>
+      <button class="dc-act dc-del" data-del-br="${b.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6h16Z"/></svg></button>
+    </div>
+  </div>`;
+}
+
+/* ===== BRANCH STAFF PANEL (drilled into a branch) ===== */
+function branchStaffPanel(branchId, filter=''){
+  const b = DATA.branches.find(x=>x.id===branchId);
+  if(!b){ activeBranch=null; return branchesPanel(); }
+  const f = filter.trim().toLowerCase();
+  const rows = b.staff.filter(s => !f || [s.name,s.designation,s.staff_no].some(v=>v&&String(v).toLowerCase().includes(f)));
+  return `<div class="panel">
+    <div class="crumb">
+      <button id="backToBranches"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div><div class="ctitle">${esc(b.name)}</div><div class="csub">DPCD ${esc(b.dpcd)} · ${b.staff.length} staff</div></div>
+    </div>
+    <div class="toolbar">
+      <div class="search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input id="bsFilter" placeholder="Search staff in this branch…" value="${esc(filter)}"></div>
+      <button class="btn-add" id="addStBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>Add</button>
+    </div>
+    <div id="bsRows">${rows.length ? rows.map(stRowHtml).join('') : emptyHtml('No staff yet','Add staff for this branch.')}</div>
+  </div>`;
+}
+function stRowHtml(s){
+  return `<div class="data-card">
+    <div class="dc-icon">${ini(s.name)}</div>
+    <div class="dc-body"><div class="dc-title">${esc(s.name)}${s.is_branch_head?'<span class="head-tag">Head</span>':''}</div>
+      <div class="dc-sub">${esc(s.designation||'')} · #${esc(s.staff_no||'—')}</div></div>
+    <div class="dc-actions">
+      <button class="dc-act dc-edit" data-edit-st="${s.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg></button>
+      <button class="dc-act dc-del" data-del-st="${s.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6h16Z"/></svg></button>
+    </div>
+  </div>`;
+}
+
+/* ===== SETTINGS ===== */
+function settingsPanel(){
+  return `<div class="panel">
+    <div style="background:#fff;border-radius:14px;padding:18px;box-shadow:var(--s1);border:1px solid var(--gr200);margin-bottom:14px;">
+      <h3 style="font-family:'Playfair Display',serif;margin:0 0 12px;font-size:15px;color:var(--n2);">Change Admin Password</h3>
+      <div class="field"><label>Current password</label><input id="oldPw" type="password" placeholder="Current password"></div>
+      <div class="field"><label>New password</label><input id="newPw" type="password" placeholder="New password"></div>
+      <button class="btn btn-primary" id="changePwBtn" style="margin-top:6px;">Update Password</button>
+    </div>
+    <div style="background:#fff;border-radius:14px;padding:18px;box-shadow:var(--s1);border:1px solid var(--gr200);">
+      <h3 style="font-family:'Playfair Display',serif;margin:0 0 8px;font-size:15px;color:var(--n2);">About</h3>
+      <p style="font-size:12.5px;color:var(--gr500);line-height:1.6;margin:0;">
+        RO officials, branches and branch staff edited here update the live Canara Connect app for everyone —
+        no rebuild or redeploy needed. The app caches the last successful sync so it keeps working offline too.
+      </p>
+    </div>
+  </div>`;
+}
+
+function emptyHtml(t1, t2){
+  return `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><div class="e1">${esc(t1)}</div><div>${esc(t2)}</div></div>`;
+}
+
+/* ===== panel event binding ===== */
+function bindPanelEvents(tab){
+  if(tab === 'ro'){
+    document.getElementById('roFilter').addEventListener('input', e => {
+      document.getElementById('roRows').innerHTML = DATA.ro
+        .filter(o=>[o.name,o.designation,o.staff_no,o.section].some(v=>v&&String(v).toLowerCase().includes(e.target.value.toLowerCase())))
+        .map(roRowHtml).join('') || emptyHtml('No RO officials','Try a different search.');
+      bindRowActions('ro');
+    });
+    document.getElementById('addRoBtn').onclick = () => openRoModal(null);
+    bindRowActions('ro');
+  }
+  if(tab === 'branches' && !activeBranch){
+    document.getElementById('brFilter').addEventListener('input', e => {
+      const f = e.target.value.toLowerCase();
+      document.getElementById('brRows').innerHTML = DATA.branches
+        .filter(b=>b.name.toLowerCase().includes(f) || String(b.dpcd||'').includes(f))
+        .map(brRowHtml).join('') || emptyHtml('No branches','Try a different search.');
+      bindRowActions('branches');
+    });
+    document.getElementById('addBrBtn').onclick = () => openBranchModal(null);
+    bindRowActions('branches');
+  }
+  if(tab === 'branches' && activeBranch){
+    document.getElementById('backToBranches').onclick = () => { activeBranch=null; renderTab('branches'); };
+    const filterEl = document.getElementById('bsFilter');
+    filterEl.addEventListener('input', e => {
+      const pos = e.target.selectionStart, val = e.target.value;
+      document.getElementById('panelArea').innerHTML = branchStaffPanel(activeBranch, val);
+      bindPanelEvents('branches');
+      const nf = document.getElementById('bsFilter'); nf.focus(); nf.setSelectionRange(pos,pos);
+    });
+    document.getElementById('addStBtn').onclick = () => openStaffModal(null, activeBranch);
+    bindRowActions('branchstaff');
+  }
+  if(tab === 'settings'){
+    document.getElementById('changePwBtn').onclick = changePassword;
+  }
+}
+
+function bindRowActions(ctx){
+  if(ctx === 'ro'){
+    document.querySelectorAll('[data-edit-ro]').forEach(b=>b.onclick=()=>openRoModal(DATA.ro.find(o=>o.id==b.dataset.editRo)));
+    document.querySelectorAll('[data-del-ro]').forEach(b=>b.onclick=()=>confirmDelete('ro_officials', b.dataset.delRo, 'RO official', 'ro'));
+  }
+  if(ctx === 'branches'){
+    document.querySelectorAll('[data-view-staff]').forEach(b=>b.onclick=()=>{ activeBranch=parseInt(b.dataset.viewStaff,10); renderTab('branches'); });
+    document.querySelectorAll('[data-edit-br]').forEach(b=>b.onclick=()=>openBranchModal(DATA.branches.find(x=>x.id==b.dataset.editBr)));
+    document.querySelectorAll('[data-del-br]').forEach(b=>b.onclick=()=>confirmDelete('branches', b.dataset.delBr, 'branch', 'branches'));
+  }
+  if(ctx === 'branchstaff'){
+    document.querySelectorAll('[data-edit-st]').forEach(b=>{
+      b.onclick=()=>{
+        const branch = DATA.branches.find(x=>x.id===activeBranch);
+        openStaffModal(branch.staff.find(s=>s.id==b.dataset.editSt), activeBranch);
+      };
+    });
+    document.querySelectorAll('[data-del-st]').forEach(b=>b.onclick=()=>confirmDelete('branch_staff', b.dataset.delSt, 'staff member', 'branches'));
+  }
+}
+
+async function confirmDelete(table, id, label, backTab){
+  if(!confirm(`Delete this ${label}? This cannot be undone.`)) return;
+  const { error } = await sb.from(table).delete().eq('id', id);
+  if(error){ toast('Delete failed: '+error.message, true); return; }
+  await loadAll();
+  renderTab(backTab);
+  toast(label.charAt(0).toUpperCase()+label.slice(1)+' deleted');
+}
+
+/* ===== MODAL ===== */
+const modalBackdrop = document.getElementById('modalBackdrop');
+const modalBody = document.getElementById('modalBody');
+function openModal(html){ modalBody.innerHTML = html; modalBackdrop.classList.add('open'); }
+function closeModal(){ modalBackdrop.classList.remove('open'); }
+modalBackdrop.addEventListener('click', e => { if(e.target === modalBackdrop) closeModal(); });
+
+function openRoModal(o){
+  const isEdit = !!o;
+  const secOpts = SECTION_LIST.map(s=>`<option value="${esc(s)}" ${o&&o.section===s?'selected':''}>${esc(s)}</option>`).join('');
+  openModal(`
+    <div class="modal-handle"></div>
+    <h2>${isEdit?'Edit RO Official':'Add RO Official'}</h2>
+    <div class="field"><label>Full name</label><input id="m_name" value="${esc(o?.name||'')}" placeholder="e.g. MUKESH MALHOTRA"></div>
+    <div class="field"><label>Designation</label><input id="m_desig" value="${esc(o?.designation||'')}" placeholder="e.g. Deputy General Manager"></div>
+    <div class="field"><label>Section</label><select id="m_section">${secOpts}</select></div>
+    <div class="field"><label>Staff number</label><input id="m_staffno" value="${esc(o?.staff_no||'')}" placeholder="e.g. 854223"></div>
+    <div class="field"><label>Mobile (10 digit)</label><input id="m_mobile" value="${esc(o?.mobile||'')}" placeholder="e.g. 9935169190"></div>
+    <div class="field"><label>Email</label><input id="m_email" value="${esc(o?.email||'')}" placeholder="e.g. name@canarabank.com"></div>
+    <div class="field"><label>Head label (optional)</label><input id="m_head" value="${esc(o?.is_head||'')}" placeholder="Regional Head / Section Head — leave blank if none"></div>
+    <div class="hint">Use "Regional Head" for the DGM, "Section Head" for a section in-charge, or leave blank.</div>
+    <div class="field"><label>Display order</label><input id="m_order" type="number" value="${o?.display_order ?? DATA.ro.length}"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="m_cancel" style="flex:1;">Cancel</button>
+      <button class="btn btn-primary" id="m_save" style="flex:1;">${isEdit?'Save Changes':'Add Official'}</button>
+    </div>
+  `);
+  document.getElementById('m_cancel').onclick = closeModal;
+  document.getElementById('m_save').onclick = async () => {
+    const name = document.getElementById('m_name').value.trim();
+    if(!name){ toast('Name is required', true); return; }
+    const payload = {
+      name,
+      designation: document.getElementById('m_desig').value.trim(),
+      section: document.getElementById('m_section').value,
+      staff_no: document.getElementById('m_staffno').value.trim(),
+      mobile: document.getElementById('m_mobile').value.trim().replace(/\D/g,''),
+      email: document.getElementById('m_email').value.trim(),
+      is_head: document.getElementById('m_head').value.trim(),
+      display_order: parseInt(document.getElementById('m_order').value,10) || 0
+    };
+    const { error } = isEdit
+      ? await sb.from('ro_officials').update(payload).eq('id', o.id)
+      : await sb.from('ro_officials').insert(payload);
+    if(error){ toast('Save failed: '+error.message, true); return; }
+    closeModal(); await loadAll(); renderTab('ro');
+    toast(isEdit ? 'Official updated' : 'Official added');
+  };
+}
+
+function openBranchModal(b){
+  const isEdit = !!b;
+  openModal(`
+    <div class="modal-handle"></div>
+    <h2>${isEdit?'Edit Branch':'Add Branch'}</h2>
+    <div class="field"><label>Branch name</label><input id="m_name" value="${esc(b?.name||'')}" placeholder="e.g. BENGALURU YELAHANKA"></div>
+    <div class="field"><label>DPCD</label><input id="m_dpcd" value="${esc(b?.dpcd||'')}" placeholder="DPCD code (unique)"></div>
+    <div class="field"><label>Address</label><input id="m_addr" value="${esc(b?.address||'')}" placeholder="Full branch address"></div>
+    <div class="field"><label>IFSC</label><input id="m_ifsc" value="${esc(b?.ifsc||'')}" placeholder="e.g. CNRB0000476"></div>
+    <div class="field"><label>Landline</label><input id="m_landline" value="${esc(b?.landline||'')}" placeholder="e.g. 080-28469221"></div>
+    <div class="field"><label>CUG Mobile</label><input id="m_cug" value="${esc(b?.cug_mobile||'')}" placeholder="10-digit CUG mobile"></div>
+    <div class="field"><label>Latitude</label><input id="m_lat" value="${b?.lat??''}" placeholder="e.g. 13.2776"></div>
+    <div class="field"><label>Longitude</label><input id="m_lng" value="${b?.lng??''}" placeholder="e.g. 77.6882"></div>
+    <div class="hint">Latitude/longitude power the Distance Finder tab — leave blank if unknown.</div>
+    <div class="field"><label>Display order</label><input id="m_order" type="number" value="${b?.display_order ?? DATA.branches.length}"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="m_cancel" style="flex:1;">Cancel</button>
+      <button class="btn btn-primary" id="m_save" style="flex:1;">${isEdit?'Save Changes':'Add Branch'}</button>
+    </div>
+  `);
+  document.getElementById('m_cancel').onclick = closeModal;
+  document.getElementById('m_save').onclick = async () => {
+    const name = document.getElementById('m_name').value.trim();
+    const dpcd = document.getElementById('m_dpcd').value.trim();
+    if(!name || !dpcd){ toast('Branch name and DPCD are required', true); return; }
+    const latVal = document.getElementById('m_lat').value.trim();
+    const lngVal = document.getElementById('m_lng').value.trim();
+    const payload = {
+      name, dpcd,
+      address: document.getElementById('m_addr').value.trim(),
+      ifsc: document.getElementById('m_ifsc').value.trim(),
+      landline: document.getElementById('m_landline').value.trim(),
+      cug_mobile: document.getElementById('m_cug').value.trim().replace(/\D/g,''),
+      lat: latVal ? parseFloat(latVal) : null,
+      lng: lngVal ? parseFloat(lngVal) : null,
+      display_order: parseInt(document.getElementById('m_order').value,10) || 0
+    };
+    const { error } = isEdit
+      ? await sb.from('branches').update(payload).eq('id', b.id)
+      : await sb.from('branches').insert(payload);
+    if(error){ toast('Save failed: '+error.message, true); return; }
+    closeModal(); await loadAll(); renderTab('branches');
+    toast(isEdit ? 'Branch updated' : 'Branch added');
+  };
+}
+
+function openStaffModal(s, branchId){
+  const isEdit = !!s;
+  const branch = DATA.branches.find(x=>x.id===branchId);
+  openModal(`
+    <div class="modal-handle"></div>
+    <h2>${isEdit?'Edit Staff':'Add Staff'} <span style="font-size:12px;color:var(--gr500);font-weight:600;">— ${esc(branch?.name||'')}</span></h2>
+    <div class="field"><label>Full name</label><input id="m_name" value="${esc(s?.name||'')}" placeholder="e.g. P RAVI KUMAR"></div>
+    <div class="field"><label>Designation</label><input id="m_desig" value="${esc(s?.designation||'')}" placeholder="e.g. Manager"></div>
+    <div class="field"><label>Staff number</label><input id="m_staffno" value="${esc(s?.staff_no||'')}" placeholder="e.g. 889202"></div>
+    <div class="field"><label>Mobile (10 digit)</label><input id="m_mobile" value="${esc(s?.mobile||'')}" placeholder="e.g. 9742621680"></div>
+    <div class="field"><label>Email</label><input id="m_email" value="${esc(s?.email||'')}" placeholder="e.g. name@canarabank.com"></div>
+    <div class="checkrow"><input type="checkbox" id="m_head" ${s?.is_branch_head?'checked':''}><label for="m_head">Branch Head</label></div>
+    <div class="field"><label>Display order</label><input id="m_order" type="number" value="${s?.display_order ?? branch.staff.length}"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="m_cancel" style="flex:1;">Cancel</button>
+      <button class="btn btn-primary" id="m_save" style="flex:1;">${isEdit?'Save Changes':'Add Staff'}</button>
+    </div>
+  `);
+  document.getElementById('m_cancel').onclick = closeModal;
+  document.getElementById('m_save').onclick = async () => {
+    const name = document.getElementById('m_name').value.trim();
+    if(!name){ toast('Name is required', true); return; }
+    const payload = {
+      name,
+      designation: document.getElementById('m_desig').value.trim(),
+      staff_no: document.getElementById('m_staffno').value.trim(),
+      mobile: document.getElementById('m_mobile').value.trim().replace(/\D/g,''),
+      email: document.getElementById('m_email').value.trim(),
+      is_branch_head: document.getElementById('m_head').checked,
+      branch_id: branchId,
+      display_order: parseInt(document.getElementById('m_order').value,10) || 0
+    };
+    const { error } = isEdit
+      ? await sb.from('branch_staff').update(payload).eq('id', s.id)
+      : await sb.from('branch_staff').insert(payload);
+    if(error){ toast('Save failed: '+error.message, true); return; }
+    closeModal(); await loadAll(); renderTab('branches');
+    toast(isEdit ? 'Staff updated' : 'Staff added');
+  };
+}
+
+async function changePassword(){
+  const oldPw = document.getElementById('oldPw').value.trim();
+  const newPw = document.getElementById('newPw').value.trim();
+  if(!oldPw || !newPw){ toast('Fill both fields', true); return; }
+  if(newPw.length < 6){ toast('New password should be at least 6 characters', true); return; }
+  const { data, error } = await sb.rpc('set_admin_password', { old_password: oldPw, new_password: newPw });
+  if(error){ toast('Failed: '+error.message, true); return; }
+  if(data === true){
+    toast('Password updated');
+    document.getElementById('oldPw').value=''; document.getElementById('newPw').value='';
+  } else {
+    toast('Current password is incorrect', true);
+  }
+}
+</script>
+</body>
+</html>

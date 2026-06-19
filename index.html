@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#001233">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Canara Connect">
+<link rel="manifest" href="manifest.json">
+<title>Canara Connect · North RO</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{
+  --n:#001233;--n2:#002366;--n3:#003087;--n4:#0044bb;
+  --g:#F5A623;--g2:#FFD166;--g3:#d4880a;
+  --w:#fff;
+  --gr50:#f8f9fa;--gr100:#f0f2f5;--gr200:#e0e4ea;--gr300:#c8cfd8;
+  --gr500:#6b7280;--gr700:#374151;--gr900:#111827;
+  --s1:0 2px 8px rgba(0,48,135,0.10);--s2:0 4px 20px rgba(0,48,135,0.16);--s3:0 8px 40px rgba(0,48,135,0.22);
+  --sg:0 4px 16px rgba(245,166,35,0.35);
+  --r:16px;--rs:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:var(--gr100);color:var(--gr900)}
+
+/* PARTICLES */
+#pts{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.pt{position:absolute;border-radius:50%;animation:ptF linear infinite;opacity:0}
+@keyframes ptF{0%{transform:translateY(110vh) rotate(0deg);opacity:0}10%{opacity:0.6}90%{opacity:0.15}100%{transform:translateY(-10vh) rotate(720deg);opacity:0}}
+
+/* SPLASH */
+#splash{position:fixed;inset:0;z-index:9999;background:var(--n);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.8s ease;overflow:hidden}
+#splash.out{opacity:0;pointer-events:none}
+.sp-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(0,68,187,0.5),transparent 60%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(245,166,35,0.1),transparent 50%)}
+.sp-ring{position:absolute;border-radius:50%;border:1px solid rgba(245,166,35,0.12);animation:rp 4s ease-in-out infinite}
+.sp-ring:nth-child(1){width:220px;height:220px;animation-delay:0s}
+.sp-ring:nth-child(2){width:340px;height:340px;animation-delay:0.6s;border-color:rgba(245,166,35,0.06)}
+.sp-ring:nth-child(3){width:460px;height:460px;animation-delay:1.2s;border-color:rgba(245,166,35,0.03)}
+@keyframes rp{0%,100%{transform:scale(1);opacity:0.5}50%{transform:scale(1.06);opacity:1}}
+.sp-c{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 28px}
+.sp-icon{width:96px;height:96px;border-radius:28px;margin-bottom:24px;background:linear-gradient(145deg,rgba(255,255,255,0.1),rgba(255,255,255,0.03));border:1px solid rgba(245,166,35,0.3);display:flex;align-items:center;justify-content:center;animation:iconIn 1s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;box-shadow:0 0 60px rgba(245,166,35,0.12)}
+.sp-icon svg{width:54px;height:54px}
+@keyframes iconIn{from{transform:scale(0) rotate(-20deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+.sp-title{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:#fff;line-height:1.1;letter-spacing:-0.5px;animation:fu 0.7s ease 0.6s both}
+.sp-title em{color:var(--g);font-style:normal}
+.sp-sub{color:rgba(255,255,255,0.4);font-size:11px;font-weight:500;letter-spacing:3px;text-transform:uppercase;margin-top:8px;animation:fu 0.7s ease 0.8s both}
+.sp-line{width:44px;height:2px;background:linear-gradient(90deg,transparent,var(--g),transparent);margin:20px 0;animation:fu 0.7s ease 0.9s both}
+.sp-stats{display:flex;gap:32px;animation:fu 0.7s ease 1s both}
+.sp-stat strong{display:block;font-family:'Playfair Display',serif;font-size:30px;font-weight:700;color:var(--g);line-height:1}
+.sp-stat span{color:rgba(255,255,255,0.35);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-top:4px;display:block}
+
+/* SPLASH INSTALL BTN */
+.sp-install-btn{
+  display:none;margin-top:28px;width:100%;max-width:280px;
+  padding:14px 24px;border-radius:50px;
+  background:linear-gradient(135deg,var(--g),var(--g3));
+  border:none;cursor:pointer;color:var(--n);
+  font-family:'Inter',sans-serif;font-size:15px;font-weight:900;
+  letter-spacing:0.3px;animation:btnG 2s ease-in-out infinite;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.sp-install-btn svg{width:18px;height:18px}
+.sp-install-btn.show{display:flex}
+@keyframes btnG{0%,100%{box-shadow:0 6px 30px rgba(245,166,35,0.4)}50%{box-shadow:0 6px 50px rgba(245,166,35,0.7),0 0 0 8px rgba(245,166,35,0.08)}}
+
+.sp-enter-btn{
+  display:none;margin-top:10px;width:100%;max-width:280px;
+  padding:12px 24px;border-radius:50px;
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);
+  cursor:pointer;color:rgba(255,255,255,0.7);
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:600;
+}
+.sp-enter-btn.show{display:block}
+
+.sp-disc{position:absolute;bottom:76px;left:20px;right:20px;z-index:2;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px 14px;animation:fu 0.7s ease 1.4s both}
+.sp-disc p{font-size:10px;color:rgba(255,255,255,0.32);line-height:1.7;text-align:center}
+.sp-disc strong{color:rgba(255,255,255,0.55)}
+.sp-foot{position:absolute;bottom:22px;z-index:2;font-size:10px;color:rgba(255,255,255,0.18);letter-spacing:0.5px;text-align:center;line-height:1.8;animation:fu 0.7s ease 1.5s both}
+@keyframes fu{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* INSTALL POPUP */
+#installPopup{
+  position:fixed;inset:0;z-index:8888;
+  background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);
+  display:none;align-items:flex-end;justify-content:center;
+  animation:popIn 0.3s ease;
+}
+#installPopup.show{display:flex}
+@keyframes popIn{from{opacity:0}to{opacity:1}}
+.popup-sheet{
+  background:#fff;border-radius:24px 24px 0 0;
+  padding:24px 20px 32px;width:100%;max-width:480px;
+  animation:sheetUp 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.popup-handle{width:36px;height:4px;background:var(--gr200);border-radius:2px;margin:0 auto 20px}
+.popup-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--gr900);margin-bottom:6px;text-align:center}
+.popup-sub{font-size:13px;color:var(--gr500);text-align:center;margin-bottom:20px;line-height:1.5}
+.popup-os{display:flex;gap:10px;margin-bottom:20px}
+.popup-os-btn{
+  flex:1;padding:12px 8px;border-radius:12px;border:2px solid var(--gr200);
+  background:#fff;cursor:pointer;text-align:center;transition:all 0.2s;
+  font-family:'Inter',sans-serif;
+}
+.popup-os-btn.active{border-color:var(--n3);background:#eff6ff}
+.popup-os-btn .os-icon{font-size:24px;margin-bottom:4px}
+.popup-os-btn .os-name{font-size:12px;font-weight:700;color:var(--gr700)}
+.popup-steps{background:var(--gr50);border-radius:12px;padding:16px;margin-bottom:16px}
+.popup-step{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}
+.popup-step:last-child{margin-bottom:0}
+.ps-num{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--n2),var(--n3));color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.ps-txt{font-size:12px;color:var(--gr700);line-height:1.6}
+.ps-txt strong{color:var(--gr900);font-weight:700}
+.ps-hl{color:var(--n3);font-weight:700;background:#eff6ff;padding:1px 5px;border-radius:4px}
+.popup-close{width:100%;padding:14px;border-radius:12px;background:var(--gr100);border:none;cursor:pointer;font-size:14px;font-weight:700;color:var(--gr700);font-family:'Inter',sans-serif}
+
+/* STICKY INSTALL BANNER */
+#installBanner{
+  position:fixed;top:0;left:0;right:0;z-index:7777;
+  background:linear-gradient(135deg,var(--n),var(--n2));
+  padding:10px 16px;
+  display:none;align-items:center;gap:10px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);
+}
+#installBanner.show{display:flex}
+.ib-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--g3),var(--g));display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ib-icon svg{width:20px;height:20px;color:var(--n)}
+.ib-text{flex:1;min-width:0}
+.ib-text strong{display:block;font-size:13px;font-weight:700;color:#fff;line-height:1.2}
+.ib-text span{font-size:11px;color:rgba(255,255,255,0.6)}
+.ib-btn{padding:8px 14px;border-radius:20px;background:var(--g);border:none;cursor:pointer;font-size:12px;font-weight:800;color:var(--n);white-space:nowrap;font-family:'Inter',sans-serif}
+.ib-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.1);border:none;cursor:pointer;color:rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ib-close svg{width:14px;height:14px}
+
+/* APP */
+#app{display:none;flex-direction:column;height:100%;position:relative;z-index:2}
+
+/* HEADER */
+#hdr{background:linear-gradient(180deg,#000e2a 0%,var(--n2) 100%);flex-shrink:0;padding-top:env(safe-area-inset-top,0);position:relative;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,0.3)}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px}
+.hdr-brand{display:flex;align-items:center;gap:10px}
+.hdr-logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--g3),var(--g));display:flex;align-items:center;justify-content:center;box-shadow:var(--sg)}
+.hdr-logo svg{width:22px;height:22px;color:var(--n)}
+.hdr-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;line-height:1.1}
+.hdr-sub{font-size:10px;color:var(--g);font-weight:600;text-transform:uppercase;letter-spacing:1.5px;margin-top:1px}
+.hdr-right{display:flex;gap:8px}
+.hdr-btn{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;transition:all 0.2s}
+.hdr-btn:active{background:rgba(255,255,255,0.18);transform:scale(0.92)}
+.hdr-btn svg{width:17px;height:17px}
+
+/* TABS */
+.tabs{display:flex;background:rgba(0,0,0,0.25);padding:0 4px;overflow-x:auto}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1;min-width:52px;padding:8px 2px;border:none;background:none;cursor:pointer;color:rgba(255,255,255,0.38);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;border-bottom:2.5px solid transparent;transition:all 0.25s;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tab .ti{width:28px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.05);transition:all 0.25s}
+.tab .ti svg{width:13px;height:13px}
+.tab.active{color:var(--g);border-bottom-color:var(--g)}
+.tab.active .ti{background:rgba(245,166,35,0.15)}
+
+/* FILTER */
+.filter-bar{background:#fff;padding:10px 16px;display:none;gap:8px;overflow-x:auto;border-bottom:1px solid var(--gr200);flex-shrink:0}
+.filter-bar::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--gr200);background:#fff;font-size:12px;font-weight:700;color:var(--gr700);cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.chip.active{background:linear-gradient(135deg,var(--n2),var(--n3));border-color:transparent;color:#fff;box-shadow:0 4px 12px rgba(0,48,135,0.28)}
+
+/* CONTENT */
+#content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--gr100)}
+#content::-webkit-scrollbar{display:none}
+
+/* RO VIEW */
+.ro-view{padding-bottom:120px}
+.ro-hero{
+  background:linear-gradient(140deg,#000e2a 0%,var(--n2) 60%,#004db3 100%);
+  padding:16px;position:relative;overflow:hidden;
+}
+.ro-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(245,166,35,0.12),transparent 70%)}
+.ro-hero-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:rgba(255,255,255,0.9);position:relative;z-index:1}
+.ro-hero-sub{font-size:10px;color:rgba(255,255,255,0.4);margin-top:2px;letter-spacing:1px;text-transform:uppercase;position:relative;z-index:1}
+.ro-sec-hdr{padding:10px 16px;font-size:10px;font-weight:800;color:var(--gr500);text-transform:uppercase;letter-spacing:1px;background:var(--gr100);border-bottom:1px solid var(--gr200);position:sticky;top:0;z-index:5}
+
+/* STAFF ITEM with accordion */
+.si{
+  background:#fff;border-bottom:1px solid var(--gr100);
+  overflow:hidden;transition:all 0.2s;
+}
+.si-top{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;cursor:pointer;transition:background 0.15s;
+}
+.si-top:active{background:var(--gr50)}
+.sav{width:42px;height:42px;border-radius:13px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;box-shadow:var(--s1)}
+.sinf{flex:1;min-width:0}
+.sn{font-size:13px;font-weight:700;color:var(--gr900);line-height:1.3}
+.sd{font-size:11px;color:var(--gr500);margin-top:2px}
+.sno{font-size:10px;color:var(--gr300);font-family:monospace;margin-top:1px}
+.hbadge{display:inline-block;padding:1px 7px;border-radius:5px;background:linear-gradient(135deg,var(--g),var(--g3));color:var(--n);font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:0.5px;margin-left:6px}
+.si-chevron{width:20px;height:20px;border-radius:6px;background:var(--gr100);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.3s}
+.si-chevron svg{width:12px;height:12px;color:var(--gr500);transition:transform 0.3s}
+.si.open .si-chevron{background:var(--n3)}
+.si.open .si-chevron svg{transform:rotate(180deg);color:#fff}
+
+/* ACCORDION CONTACT PANEL */
+.si-contact{
+  max-height:0;
+  overflow:hidden;
+  padding:0 14px 0 68px;
+  flex-direction:column;gap:8px;
+  transition:max-height 0.3s ease, padding 0.3s ease;
+  display:flex;
+}
+.si.open .si-contact{max-height:400px;padding:0 14px 12px 68px;}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.contact-row{
+  display:flex;align-items:center;gap:10px;
+  background:var(--gr50);border-radius:10px;padding:10px 12px;
+  border:1px solid var(--gr200);
+}
+.contact-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.contact-icon svg{width:15px;height:15px}
+.contact-icon.call{background:#e8f0fe}
+.contact-icon.call svg{color:#1a56db}
+.contact-icon.wa{background:#dcfce7}
+.contact-icon.wa svg{color:#16a34a}
+.contact-icon.mail{background:#fdf4ff}
+.contact-icon.mail svg{color:#9333ea}
+.contact-detail{flex:1;min-width:0}
+.contact-label{font-size:9px;font-weight:700;color:var(--gr400);text-transform:uppercase;letter-spacing:0.5px}
+.contact-value{font-size:13px;font-weight:600;color:var(--gr900);margin-top:1px}
+.contact-btn{
+  padding:7px 14px;border-radius:8px;border:none;cursor:pointer;
+  font-size:11px;font-weight:800;font-family:'Inter',sans-serif;
+  transition:all 0.15s;white-space:nowrap;
+}
+.contact-btn.call{background:#1a56db;color:#fff}
+.contact-btn.wa{background:#16a34a;color:#fff}
+.contact-btn.mail{background:#9333ea;color:#fff}
+.contact-btn:active{transform:scale(0.92);filter:brightness(0.9)}
+
+/* BRANCH CARDS */
+.bv{padding:10px 0 120px}
+.bv-hdr{padding:4px 16px 10px;display:flex;align-items:center;justify-content:space-between}
+.bv-count{font-size:12px;color:var(--gr500);font-weight:600}
+.bcard{margin:0 16px 12px;border-radius:var(--r);overflow:hidden;box-shadow:var(--s2);animation:cslide 0.35s ease both;background:#fff;border:1px solid rgba(0,48,135,0.08)}
+@keyframes cslide{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.bc-hero{padding:16px 16px 12px;background:linear-gradient(140deg,#000e2a 0%,var(--n2) 55%,#004db3 100%);position:relative;overflow:hidden;cursor:pointer}
+.bc-hero:active{filter:brightness(1.08)}
+.bc-glow1{position:absolute;top:-50px;right:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(245,166,35,0.14),transparent 70%)}
+.bc-glow2{position:absolute;bottom:-70px;left:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(0,68,187,0.25),transparent 70%)}
+.bc-top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;margin-bottom:10px}
+.bc-dpcd{font-size:9px;color:rgba(255,255,255,0.25);font-weight:600;letter-spacing:1px}
+.bc-ifsc{font-size:9px;color:rgba(255,255,255,0.3);font-family:monospace;background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:5px}
+.bc-name{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff;line-height:1.25;position:relative;z-index:1;margin-bottom:6px}
+.bc-addr{font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;position:relative;z-index:1;font-weight:300;margin-bottom:12px}
+.bc-foot{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
+.bc-head-wrap{display:flex;align-items:center;gap:8px}
+.bc-av{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;border:1.5px solid rgba(255,255,255,0.18);flex-shrink:0}
+.bc-hname{font-size:12px;font-weight:700;color:#fff;line-height:1.2}
+.bc-hdesg{font-size:10px;color:var(--g);font-weight:600;margin-top:1px}
+.bc-pills{display:flex;gap:5px;align-items:center}
+.bc-pill{padding:4px 10px;border-radius:8px;font-size:10px;font-weight:700;background:rgba(255,255,255,0.09);color:rgba(255,255,255,0.65);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:3px}
+.bc-pill svg{width:10px;height:10px}
+.bc-toggle{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 0 0;position:relative;z-index:1;color:rgba(255,255,255,0.25);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer}
+.bc-toggle svg{width:14px;height:14px;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1)}
+.bcard.open .bc-toggle svg{transform:rotate(180deg)}
+.bc-cug{padding:10px 12px;background:#fff;display:flex;gap:8px;border-bottom:1px solid var(--gr100)}
+.act-btn{flex:1;padding:9px 4px;border-radius:10px;border:none;cursor:pointer;font-size:10px;font-weight:800;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:5px;transition:all 0.15s}
+.act-btn .aico{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.act-btn .aico svg{width:13px;height:13px}
+.act-btn:active{transform:scale(0.93);filter:brightness(0.9)}
+.act-btn.call{background:#e8f0fe;color:#1a56db}.act-btn.call .aico{background:#1a56db}.act-btn.call .aico svg{color:#fff}
+.act-btn.wa{background:#dcfce7;color:#15803d}.act-btn.wa .aico{background:#16a34a}.act-btn.wa .aico svg{color:#fff}
+.act-btn.map{background:#fff3e0;color:#c2410c}.act-btn.map .aico{background:#ea580c}.act-btn.map .aico svg{color:#fff}
+.bc-staff{display:none;background:#fff}
+.bcard.open .bc-staff{display:block}
+
+/* HEADS TAB */
+.hv{padding-bottom:120px}
+.hv-sec-hdr{padding:10px 16px;font-size:10px;font-weight:800;color:var(--gr500);text-transform:uppercase;letter-spacing:1px;background:var(--gr100);border-bottom:1px solid var(--gr200);position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:6px}
+.hv-sec-hdr .hv-badge{padding:2px 8px;border-radius:6px;font-size:9px;font-weight:800;background:linear-gradient(135deg,var(--g3),var(--g));color:var(--n)}
+
+/* STAFF TAB */
+.sv{padding:8px 16px 120px;display:flex;flex-direction:column;gap:8px}
+.stc{background:#fff;border-radius:var(--rs);box-shadow:var(--s1);border:1px solid var(--gr200);overflow:hidden;animation:cslide 0.3s ease both}
+.stc-top{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer}
+.st-br{font-size:10px;color:var(--n3);background:#eff6ff;padding:3px 8px;border-radius:6px;font-weight:700;display:inline-block;margin-top:4px}
+
+/* DISTANCE TAB */
+.dv{padding:16px;padding-bottom:120px}
+.dv-warn{background:linear-gradient(135deg,#fffbeb,#fef9c3);border:1px solid #fde68a;border-radius:var(--r);padding:14px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start}
+.dv-warn svg{width:20px;height:20px;color:#d97706;flex-shrink:0;margin-top:1px}
+.dv-warn p{font-size:11px;color:#92400e;line-height:1.7}
+.dc{background:#fff;border-radius:var(--r);padding:20px;box-shadow:var(--s1);border:1px solid var(--gr200);margin-bottom:16px}
+.dc h3{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--gr900);margin-bottom:6px}
+.dc p{font-size:12px;color:var(--gr500);margin-bottom:16px;line-height:1.6}
+.loc-btn{width:100%;padding:14px;border-radius:var(--rs);background:linear-gradient(135deg,var(--n),var(--n3));border:none;color:#fff;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;box-shadow:var(--s2);margin-bottom:12px;font-family:'Inter',sans-serif}
+.loc-btn:active{transform:scale(0.98);opacity:0.9}
+.loc-btn svg{width:18px;height:18px}
+.mloc{display:none;background:var(--gr50);border-radius:var(--rs);padding:12px;border:1px solid var(--gr200)}
+.mloc.show{display:block}
+.nlist{display:none;flex-direction:column;gap:10px}
+.nlist.show{display:flex}
+.nc{background:#fff;border-radius:var(--rs);padding:14px;box-shadow:var(--s1);border:1px solid var(--gr200);display:flex;align-items:center;gap:12px;cursor:pointer;transition:all 0.2s}
+.nc:active{box-shadow:var(--s2);transform:scale(0.99)}
+.nrk{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800}
+.nrk.g{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff}
+.nrk.s{background:linear-gradient(135deg,#9ca3af,#6b7280);color:#fff}
+.nrk.b{background:linear-gradient(135deg,#cd7c2f,#b45309);color:#fff}
+.nrk.n{background:var(--gr100);color:var(--gr700)}
+.ninfo{flex:1;min-width:0}
+.nname{font-size:13px;font-weight:700;color:var(--gr900)}
+.ndist{font-size:12px;color:var(--n3);font-weight:700;margin-top:2px}
+.naddr{font-size:11px;color:var(--gr500);margin-top:1px}
+.nmap{width:36px;height:36px;border-radius:8px;background:#fff3e0;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#ea580c;flex-shrink:0}
+.nmap svg{width:18px;height:18px}
+.b2bc{background:#fff;border-radius:var(--r);padding:20px;box-shadow:var(--s1);border:1px solid var(--gr200);margin-top:16px}
+.b2bc h3{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--gr900);margin-bottom:16px}
+.b2bs{width:100%;padding:12px 36px 12px 12px;border:1.5px solid var(--gr200);border-radius:var(--rs);font-size:13px;color:var(--gr900);background:#fff;margin-bottom:10px;-webkit-appearance:none;appearance:none;outline:none;cursor:pointer;font-family:'Inter',sans-serif;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.b2bs:focus{border-color:var(--n3)}
+.b2bd{display:flex;align-items:center;gap:12px;margin:4px 0}
+.b2bd span{font-size:11px;color:var(--gr500);font-weight:700}
+.b2bd::before,.b2bd::after{content:'';flex:1;height:1px;background:var(--gr200)}
+.b2bb{width:100%;padding:14px;border-radius:var(--rs);background:linear-gradient(135deg,var(--n),var(--n3));border:none;color:#fff;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;box-shadow:var(--s2);font-family:'Inter',sans-serif;transition:all 0.2s}
+.b2bb:active{transform:scale(0.98);opacity:0.9}
+.b2bb svg{width:18px;height:18px}
+.b2br{display:none;margin-top:14px;padding:18px;border-radius:var(--rs);background:var(--gr50);border:1px solid var(--gr200);text-align:center}
+.b2br.show{display:block}
+.b2bv{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--n)}
+.b2bl{font-size:12px;color:var(--gr500);margin-bottom:14px;margin-top:2px}
+.b2bm{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:8px;background:#fff3e0;color:#c2410c;font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:'Inter',sans-serif}
+.b2bm svg{width:16px;height:16px}
+
+/* INSTALL TAB */
+.iv{padding:16px;padding-bottom:120px}
+.iv-hero{border-radius:var(--r);padding:28px 24px;text-align:center;margin-bottom:16px;background:linear-gradient(135deg,var(--n) 0%,var(--n2) 100%);position:relative;overflow:hidden}
+.iv-hero::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:rgba(245,166,35,0.07)}
+.iv-hero .hi{font-size:52px;margin-bottom:12px;position:relative;z-index:1}
+.iv-hero h2{font-family:'Playfair Display',serif;color:#fff;font-size:20px;font-weight:700;margin-bottom:8px;position:relative;z-index:1}
+.iv-hero p{color:rgba(255,255,255,0.55);font-size:13px;line-height:1.6;position:relative;z-index:1}
+.iv-btn{width:100%;padding:14px;border-radius:12px;background:linear-gradient(135deg,var(--g3),var(--g));border:none;cursor:pointer;font-size:14px;font-weight:900;color:var(--n);font-family:'Inter',sans-serif;margin-top:16px;display:flex;align-items:center;justify-content:center;gap:8px;position:relative;z-index:1}
+.iv-btn svg{width:18px;height:18px}
+.iv-sec{background:#fff;border-radius:var(--r);padding:20px;margin-bottom:12px;box-shadow:var(--s1);border:1px solid var(--gr200)}
+.iv-sec h3{font-size:14px;font-weight:800;color:var(--gr900);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.iv-step{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start}
+.iv-step:last-child{margin-bottom:0}
+.stepn{width:28px;height:28px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--n2),var(--n3));color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.stept{flex:1;padding-top:4px}
+.stept strong{display:block;font-size:13px;font-weight:700;color:var(--gr900);margin-bottom:2px}
+.stept span{font-size:12px;color:var(--gr500);line-height:1.5}
+.hl{color:var(--n3);font-weight:700;background:#eff6ff;padding:1px 6px;border-radius:4px;display:inline}
+.iv-note{background:#fffbeb;border:1px solid #fde68a;border-radius:var(--rs);padding:14px;display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}
+.iv-note svg{width:18px;height:18px;color:#d97706;flex-shrink:0;margin-top:1px}
+.iv-note p{font-size:12px;color:#92400e;line-height:1.6}
+.iv-about{background:#fff;border-radius:var(--r);padding:20px;box-shadow:var(--s1);border:1px solid var(--gr200)}
+.iv-about h3{font-size:14px;font-weight:800;color:var(--gr900);margin-bottom:14px}
+.abox{border-radius:var(--rs);padding:12px 14px;margin-bottom:10px}
+.abox.bl{background:#eff6ff;border:1px solid #bfdbfe}
+.abox.bl p{font-size:11px;color:#1e40af;line-height:1.7}
+.abox.am{background:#fffbeb;border:1px solid #fde68a}
+.abox.am p{font-size:11px;color:#92400e;line-height:1.7}
+
+/* BOTTOM SEARCH */
+#bsearch{position:fixed;bottom:62px;left:0;right:0;z-index:99;background:rgba(255,255,255,0.98);border-top:1px solid var(--gr200);padding:8px 14px;box-shadow:0 -2px 20px rgba(0,0,0,0.08);display:none;align-items:center;gap:8px}
+.srchbox{flex:1;display:flex;align-items:center;gap:8px;background:var(--gr100);border-radius:24px;padding:10px 16px;border:2px solid transparent;transition:all 0.2s}
+.srchbox.focus{border-color:var(--n3);background:#fff;box-shadow:0 0 0 4px rgba(0,48,135,0.07)}
+.srchbox svg{width:16px;height:16px;color:var(--gr500);flex-shrink:0}
+#searchInput{flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--gr900);font-family:'Inter',sans-serif}
+#searchInput::placeholder{color:var(--gr300)}
+#bsClear{background:none;border:none;padding:0;cursor:pointer;display:none;width:20px;height:20px;align-items:center;justify-content:center;flex-shrink:0}
+#bsClear.show{display:flex}
+#bsClear svg{width:16px;height:16px;color:var(--gr500)}
+
+/* BOTTOM NAV */
+#bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.98);border-top:1px solid var(--gr200);display:flex;padding-bottom:env(safe-area-inset-bottom,0);z-index:100;box-shadow:0 -4px 24px rgba(0,0,0,0.1)}
+.ni{flex:1;padding:8px 2px 10px;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--gr300);transition:all 0.2s}
+.ni .nico{width:40px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:transparent;transition:all 0.25s}
+.ni .nico svg{width:20px;height:20px}
+.ni span{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;transition:color 0.2s}
+.ni.active{color:var(--n)}
+.ni.active .nico{background:rgba(0,48,135,0.1)}
+.ni:active .nico{transform:scale(0.88)}
+
+/* EMPTY */
+.empty{padding:60px 32px;text-align:center;display:none}
+.empty.show{display:block}
+.empty .ei{font-size:52px;margin-bottom:16px}
+.empty h3{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--gr700);margin-bottom:8px}
+.empty p{font-size:13px;color:var(--gr500)}
+
+/* TOAST */
+#toast{position:fixed;bottom:140px;left:50%;transform:translateX(-50%) translateY(16px);background:rgba(0,14,42,0.95);color:#fff;padding:11px 24px;border-radius:24px;font-size:13px;font-weight:600;opacity:0;transition:all 0.3s;z-index:9000;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.3)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* AVATAR COLORS */
+.d-dgm{background:linear-gradient(135deg,#1e3a8a,#2563eb)}
+.d-agm{background:linear-gradient(135deg,#1e40af,#3b82f6)}
+.d-dm{background:linear-gradient(135deg,#075985,#0ea5e9)}
+.d-cm{background:linear-gradient(135deg,#0f766e,#14b8a6)}
+.d-sm{background:linear-gradient(135deg,#065f46,#10b981)}
+.d-m{background:linear-gradient(135deg,#166534,#22c55e)}
+.d-o{background:linear-gradient(135deg,#92400e,#f59e0b)}
+.d-po{background:linear-gradient(135deg,#5b21b6,#8b5cf6)}
+</style>
+</head>
+<body>
+<div id="pts"></div>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="sp-bg"></div>
+  <div class="sp-ring"></div><div class="sp-ring"></div><div class="sp-ring"></div>
+  <div class="sp-c">
+    <div class="sp-icon">
+      <svg viewBox="0 0 54 54" fill="none">
+        <path d="M10 27L21 14L33 25L46 10" stroke="#F5A623" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="46" cy="10" r="5" fill="#F5A623"/>
+        <path d="M10 38L46 38" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M10 46L36 46" stroke="rgba(255,255,255,0.1)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="sp-title">Canara <em>Connect</em></div>
+    <div class="sp-sub">North Regional Office · Bengaluru</div>
+    <div class="sp-line"></div>
+    <div class="sp-stats">
+      <div class="sp-stat"><strong>53</strong><span>Branches</span></div>
+      <div class="sp-stat"><strong>268</strong><span>Officers</span></div>
+      <div class="sp-stat"><strong>Live</strong><span>Synced</span></div>
+    </div>
+    <button class="sp-install-btn" id="splashInstallBtn" onclick="showInstallPopup()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v13M7 10l5 5 5-5M2 17l.621 2.485A2 2 0 004.561 21h14.878a2 2 0 001.94-1.515L22 17"/></svg>
+      Install App on Your Phone
+    </button>
+    <button class="sp-enter-btn" id="splashEnterBtn" onclick="dismissSplash()">Enter Directory →</button>
+  </div>
+  <div class="sp-disc"><p>⚠️ Compiled as on <strong>26-05-2026</strong>. Any changes on later date to be updated as and when required.</p></div>
+  <div class="sp-foot">Created by GA Section · RO North · Bengaluru<br><span style="opacity:0.6">Data as on 26-05-2026</span></div>
+</div>
+
+<!-- INSTALL POPUP -->
+<div id="installPopup" onclick="if(event.target===this)closeInstallPopup()">
+  <div class="popup-sheet">
+    <div class="popup-handle"></div>
+    <div class="popup-title">Install Canara Connect</div>
+    <div class="popup-sub">Add to your home screen for one-tap access — works like a native app!</div>
+    <div class="popup-os">
+      <div class="popup-os-btn active" id="os-android" onclick="switchOS('android')">
+        <div class="os-icon">🤖</div>
+        <div class="os-name">Android</div>
+      </div>
+      <div class="popup-os-btn" id="os-ios" onclick="switchOS('ios')">
+        <div class="os-icon">🍎</div>
+        <div class="os-name">iPhone / iPad</div>
+      </div>
+    </div>
+    <div class="popup-steps" id="androidSteps">
+      <div class="popup-step"><div class="ps-num">1</div><div class="ps-txt"><strong>Open GitHub Pages URL in Chrome</strong><br>Use: <span class="ps-hl">psas091090-droid.github.io/canara-north-ro</span></div></div>
+      <div class="popup-step"><div class="ps-num">2</div><div class="ps-txt"><strong>Tap Install banner</strong><br>Chrome shows <span class="ps-hl">Install App</span> at bottom automatically</div></div>
+      <div class="popup-step"><div class="ps-num">3</div><div class="ps-txt"><strong>OR: Menu → Add to Home Screen</strong><br>Tap ⋮ menu → <span class="ps-hl">Add to Home Screen</span> → Install ✅</div></div>
+    </div>
+    <div class="popup-steps" id="iosSteps" style="display:none">
+      <div class="popup-step"><div class="ps-num">1</div><div class="ps-txt"><strong>Open in Safari</strong><br>Must use <span class="ps-hl">Safari</span> browser (not Chrome)</div></div>
+      <div class="popup-step"><div class="ps-num">2</div><div class="ps-txt"><strong>Tap Share ⬆️</strong><br>Tap the Share icon at the bottom of Safari</div></div>
+      <div class="popup-step"><div class="ps-num">3</div><div class="ps-txt"><strong>Add to Home Screen</strong><br>Scroll and tap <span class="ps-hl">Add to Home Screen</span> → Add ✅</div></div>
+    </div>
+    <button class="popup-close" onclick="closeInstallPopup()">Got it, Close</button>
+  </div>
+</div>
+
+<!-- STICKY INSTALL BANNER -->
+<div id="installBanner">
+  <div class="ib-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v13M7 10l5 5 5-5M2 17l.621 2.485A2 2 0 004.561 21h14.878a2 2 0 001.94-1.515L22 17"/></svg>
+  </div>
+  <div class="ib-text">
+    <strong>Install as App</strong>
+    <span>Tap to add to home screen</span>
+  </div>
+  <button class="ib-btn" onclick="showInstallPopup()">Install</button>
+  <button class="ib-close" onclick="closeBanner()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div id="hdr">
+    <div class="hdr-top">
+      <div class="hdr-brand">
+        <div class="hdr-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+        </div>
+        <div>
+          <div class="hdr-title">Canara Connect</div>
+          <div class="hdr-sub">North RO · Bengaluru</div>
+        </div>
+      </div>
+      <div class="hdr-right">
+        <button class="hdr-btn" id="hdr-install-btn" onclick="showInstallPopup()" title="Install App">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v13M7 10l5 5 5-5M2 17l.621 2.485A2 2 0 004.561 21h14.878a2 2 0 001.94-1.515L22 17"/></svg>
+        </button>
+        <button class="hdr-btn" onclick="switchTab('install')" title="About">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab" onclick="switchTab('ro')" id="tab-ro">
+        <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>RO
+      </button>
+      <button class="tab" onclick="switchTab('branches')" id="tab-branches">
+        <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div>Branches
+      </button>
+      <button class="tab" onclick="switchTab('staff')" id="tab-staff">
+        <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>Staff
+      </button>
+      <button class="tab" onclick="switchTab('heads')" id="tab-heads">
+        <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>Heads
+      </button>
+      <button class="tab" onclick="switchTab('distance')" id="tab-distance">
+        <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 00-8 8c0 5.25 8 14 8 14s8-8.75 8-14a8 8 0 00-8-8z"/></svg></div>Distance
+      </button>
+    </div>
+  </div>
+
+  <div class="filter-bar" id="filterBar">
+    <button class="chip active" onclick="setFilter('all',this)">All</button>
+    <button class="chip" onclick="setFilter('Divisional Manager',this)">DM</button>
+    <button class="chip" onclick="setFilter('Chief Manager',this)">CM</button>
+    <button class="chip" onclick="setFilter('Senior Manager',this)">SM</button>
+    <button class="chip" onclick="setFilter('Manager',this)">Manager</button>
+    <button class="chip" onclick="setFilter('Officer',this)">Officer</button>
+  </div>
+
+  <div id="content">
+    <!-- RO TAB — DEFAULT -->
+    <div id="view-ro">
+      <div class="ro-view" id="roView"></div>
+    </div>
+
+    <!-- BRANCHES TAB -->
+    <div id="view-branches" style="display:none">
+      <div class="bv">
+        <div class="bv-hdr"><span class="bv-count" id="branchCount">53 branches</span><span style="font-size:11px;color:var(--gr300);font-style:italic">Tap to expand</span></div>
+        <div id="branchList"></div>
+        <div class="empty" id="branchEmpty"><div class="ei">🔍</div><h3>No branches found</h3><p>Try a different search</p></div>
+      </div>
+    </div>
+
+    <!-- STAFF TAB -->
+    <div id="view-staff" style="display:none">
+      <div class="bv-hdr" style="padding:12px 16px 4px"><span class="bv-count" id="staffCount">Loading…</span></div>
+      <div class="sv" id="staffList"></div>
+      <div class="empty" id="staffEmpty"><div class="ei">🔍</div><h3>No staff found</h3><p>Try a different search</p></div>
+    </div>
+
+    <!-- HEADS TAB -->
+    <div id="view-heads" style="display:none">
+      <div class="hv" id="headsView"></div>
+    </div>
+
+    <!-- DISTANCE TAB -->
+    <div id="view-distance" style="display:none">
+      <div class="dv">
+        <div class="dv-warn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <p><strong>Distance Disclaimer:</strong> Distances are approximate aerial calculations based on available address data. Accuracy will improve as coordinates are updated. Always verify via Google Maps before travel.</p>
+        </div>
+        <div class="dc">
+          <h3>📍 Nearest Branches</h3>
+          <p>Find branches closest to your current GPS location.</p>
+          <button class="loc-btn" id="locBtn" onclick="findNearest()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 00-8 8c0 5.25 8 14 8 14s8-8.75 8-14a8 8 0 00-8-8z"/></svg>Get My Location
+          </button>
+          <div class="mloc" id="myLocDisplay"><p style="font-size:12px;color:#374151">📍 <strong id="myLocText"></strong></p></div>
+        </div>
+        <div class="nlist" id="nearbyList"></div>
+        <div class="b2bc">
+          <h3>🗺️ Branch to Branch</h3>
+          <select class="b2bs" id="b2bFrom"><option value="">— Select From Branch —</option></select>
+          <div class="b2bd"><span>TO</span></div>
+          <select class="b2bs" id="b2bTo"><option value="">— Select To Branch —</option></select>
+          <button class="b2bb" onclick="calcB2B()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Calculate Distance</button>
+          <div class="b2br" id="b2bResult">
+            <div class="b2bv" id="b2bDist">—</div>
+            <div class="b2bl" id="b2bLabel">aerial distance</div>
+            <button class="b2bm" onclick="openMapsB2B()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Open in Google Maps</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSTALL TAB -->
+    <div id="view-install" style="display:none">
+      <div class="iv">
+        <div class="iv-hero">
+          <div class="hi">📲</div>
+          <h2>Install as App</h2>
+          <p>Add to home screen for one-tap access. Directory data loads live from our secure server every time — nothing is stored on your device.</p>
+          <button class="iv-btn" onclick="showInstallPopup()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v13M7 10l5 5 5-5M2 17l.621 2.485A2 2 0 004.561 21h14.878a2 2 0 001.94-1.515L22 17"/></svg>
+            Show Install Instructions
+          </button>
+        </div>
+        <div class="iv-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <p><strong>Requires internet.</strong> All staff, branch and RO data lives only on our secure server and is fetched fresh every time you open the app — nothing is stored on this device. Distance finder also needs internet for GPS and Google Maps.</p>
+        </div>
+        <div class="iv-about">
+          <h3>📋 About & Disclaimer</h3>
+          <div class="abox bl"><p>📅 <strong>Data compiled as on: 26-05-2026</strong><br>Any changes in staff, designations or mobile numbers after this date to be updated as and when required.</p></div>
+          <div class="abox am"><p>📍 <strong>Distance Finder Disclaimer:</strong><br>Distances are approximate aerial (straight-line) calculations. Accuracy improves as coordinates are verified. Confirm via Google Maps before travel.</p></div>
+          <p style="font-size:11px;color:var(--gr500);text-align:center;margin-top:14px">Created by <strong>GA Section · RO North · Bengaluru</strong></p>
+          <p style="text-align:center;margin-top:10px"><a href="admin.html" style="color:var(--gr300);font-size:10px;text-decoration:none;border-bottom:1px dotted var(--gr300);letter-spacing:0.3px">⚙ Admin Login</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM SEARCH -->
+<div id="bsearch">
+  <div class="srchbox" id="srchBox">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="searchInput" placeholder="Search name, branch, designation…" oninput="handleSearch()" onfocus="document.getElementById('srchBox').classList.add('focus')" onblur="document.getElementById('srchBox').classList.remove('focus')" autocomplete="off" autocorrect="off" spellcheck="false">
+    <button id="bsClear" onclick="clearSearch()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div id="bnav">
+  <button class="ni active" id="nav-ro" onclick="switchTab('ro')">
+    <div class="nico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+    <span>RO</span>
+  </button>
+  <button class="ni" id="nav-branches" onclick="switchTab('branches')">
+    <div class="nico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div>
+    <span>Branches</span>
+  </button>
+  <button class="ni" id="nav-staff" onclick="switchTab('staff')">
+    <div class="nico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+    <span>Staff</span>
+  </button>
+  <button class="ni" id="nav-heads" onclick="switchTab('heads')">
+    <div class="nico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+    <span>Heads</span>
+  </button>
+  <button class="ni" id="nav-distance" onclick="switchTab('distance')">
+    <div class="nico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 00-8 8c0 5.25 8 14 8 14s8-8.75 8-14a8 8 0 00-8-8z"/></svg></div>
+    <span>Distance</span>
+  </button>
+</div>
+
+<div id="toast"></div>
+<script>
+let DIRECTORY_DATA = {roOfficials:[], branches:[]};
+const SUPABASE_URL = 'https://ffbyevyaghwhudeunadc.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmYnlldnlhZ2h3aHVkZXVuYWRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Nzc5NDgsImV4cCI6MjA5NzI1Mzk0OH0.LeRflHXlrkYKvJBwVdWh19FRMR19Slhtdj1Sd7wGj1s';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ═══ GLOBALS ═══
+let cTab='ro',cFilter='all',sQ='',myLL=null,b2bFC=null,b2bTC=null,b2bFN='',b2bTN='';
+let COORDS={};
+
+// ═══ DATA LOADING (Supabase — fetched live, never cached or stored on-device) ═══
+async function loadDirectoryData(){
+  try{
+    const [roRes, brRes, stRes] = await Promise.all([
+      sb.from('ro_officials').select('*').order('display_order'),
+      sb.from('branches').select('*').order('display_order'),
+      sb.from('branch_staff').select('*').order('display_order')
+    ]);
+    if(roRes.error) throw roRes.error;
+    if(brRes.error) throw brRes.error;
+    if(stRes.error) throw stRes.error;
+
+    const staffByBranch={};
+    (stRes.data||[]).forEach(s=>{
+      (staffByBranch[s.branch_id]=staffByBranch[s.branch_id]||[]).push({
+        staffNo:s.staff_no,name:s.name,designation:s.designation,mobile:s.mobile,email:s.email,
+        isBranchHead:s.is_branch_head?'yes':'no'
+      });
+    });
+    const newCoords={};
+    const branches=(brRes.data||[]).map(b=>{
+      if(b.lat!=null&&b.lng!=null)newCoords[b.dpcd]=[Number(b.lat),Number(b.lng)];
+      return{dpcd:b.dpcd,name:b.name,address:b.address||'',ifsc:b.ifsc||'',landline:b.landline||'',cugMobile:b.cug_mobile||'',staff:staffByBranch[b.id]||[]};
+    });
+    const roOfficials=(roRes.data||[]).map(o=>({
+      staffNo:o.staff_no,name:o.name,designation:o.designation,mobile:o.mobile,email:o.email,
+      section:o.section||'No Section',isBranchHead:o.is_head||''
+    }));
+    DIRECTORY_DATA={roOfficials,branches};
+    COORDS=newCoords;
+    return true;
+  }catch(err){
+    console.error('Directory load failed',err);
+    return false;
+  }
+}
+
+// UTILS
+function dc(d){if(!d)return'd-o';d=d.toLowerCase();if(d.includes('deputy general'))return'd-dgm';if(d.includes('assistant general'))return'd-agm';if(d.includes('divisional'))return'd-dm';if(d.includes('chief'))return'd-cm';if(d.includes('senior manager'))return'd-sm';if(d.includes('probationary'))return'd-po';if(d.includes('manager'))return'd-m';return'd-o'}
+function ini(n){if(!n)return'?';const p=n.trim().split(' ');return(p.length===1?p[0][0]:p[0][0]+p[p.length-1][0]).toUpperCase()}
+
+// SVG ICONS
+const cSvg=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>`;
+const wSvg=`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;
+const mSvg=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>`;
+const mpSvg=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>`;
+
+// PARTICLES
+function initPts(){
+  const c=document.getElementById('pts');
+  const cols=['rgba(245,166,35,0.4)','rgba(245,166,35,0.18)','rgba(255,255,255,0.1)','rgba(0,68,187,0.2)'];
+  for(let i=0;i<22;i++){
+    const p=document.createElement('div');p.className='pt';
+    const sz=Math.random()*4+2;
+    p.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;background:${cols[i%cols.length]};animation-duration:${Math.random()*16+12}s;animation-delay:-${Math.random()*18}s`;
+    c.appendChild(p);
+  }
+}
+
+// INSTALL — Smart detection
+let deferredPrompt=null;
+const isInstalled=()=>window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+
+function hideAllInstallUI(){
+  document.getElementById('installBanner').classList.remove('show');
+  document.getElementById('splashInstallBtn').style.display='none';
+  // Hide install tab button in header
+  const hib=document.getElementById('hdr-install-btn');
+  if(hib)hib.style.display='none';
+}
+
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  if(!isInstalled()){
+    document.getElementById('installBanner').classList.add('show');
+  }
+});
+
+window.addEventListener('appinstalled',()=>{
+  hideAllInstallUI();
+  deferredPrompt=null;
+  showToast('✅ App installed successfully!');
+});
+
+function showInstallPopup(){
+  if(deferredPrompt){
+    // Native Android install prompt
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(r=>{
+      if(r.outcome==='accepted'){
+        showToast('✅ Installing…');
+        hideAllInstallUI();
+      }
+      deferredPrompt=null;
+    });
+  } else {
+    // Show manual instructions popup
+    document.getElementById('installPopup').classList.add('show');
+  }
+}
+function closeInstallPopup(){document.getElementById('installPopup').classList.remove('show')}
+function closeBanner(){document.getElementById('installBanner').classList.remove('show')}
+function switchOS(os){
+  document.getElementById('androidSteps').style.display=os==='android'?'block':'none';
+  document.getElementById('iosSteps').style.display=os==='ios'?'block':'none';
+  document.getElementById('os-android').classList.toggle('active',os==='android');
+  document.getElementById('os-ios').classList.toggle('active',os==='ios');
+}
+
+// SPLASH
+function dismissSplash(){
+  document.getElementById('splash').classList.add('out');
+  setTimeout(()=>document.getElementById('splash').style.display='none',800);
+}
+
+window.addEventListener('DOMContentLoaded',async()=>{
+  initPts();
+  const status = await loadDirectoryData();
+  setTimeout(()=>{
+    document.getElementById('app').style.display='flex';
+    if(status){
+      renderRO();renderBranches();renderStaff();renderHeads();populateB2B();
+    } else {
+      document.getElementById('roView').innerHTML='<div style="padding:60px 32px;text-align:center"><div style="font-size:48px;margin-bottom:16px">📡</div><h3 style="font-family:\'Playfair Display\',serif;font-size:17px;font-weight:700;color:var(--gr700);margin-bottom:8px">Could not load directory</h3><p style="font-size:13px;color:var(--gr500)">Check your internet connection, then tap below to retry.</p><button class="loc-btn" style="margin-top:18px;max-width:220px" onclick="location.reload()">Retry</button></div>';
+    }
+    // If already installed as app — hide all install UI
+    if(isInstalled()){
+      hideAllInstallUI();
+    } else {
+      // Show banner after 5s only if not installed and no native prompt yet
+      setTimeout(()=>{
+        if(!isInstalled() && !deferredPrompt){
+          document.getElementById('installBanner').classList.add('show');
+        }
+      },5000);
+    }
+  },100);
+  setTimeout(()=>{
+    if(!isInstalled()){
+      document.getElementById('splashInstallBtn').classList.add('show');
+    }
+    document.getElementById('splashEnterBtn').classList.add('show');
+  },3000);
+  // Set active tab
+  switchTab('ro',true);
+});
+
+
+// TAB SWITCH
+const ALL_TABS=['ro','branches','staff','heads','distance','install'];
+function switchTab(t,silent){
+  cTab=t;
+  ALL_TABS.forEach(v=>{
+    const view=document.getElementById('view-'+v);
+    if(view)view.style.display=v===t?'block':'none';
+    const nav=document.getElementById('nav-'+v);
+    if(nav)nav.classList.toggle('active',v===t);
+    const tab=document.getElementById('tab-'+v);
+    if(tab)tab.classList.toggle('active',v===t);
+  });
+  const showSearch=['ro','branches','staff','heads'].includes(t);
+  document.getElementById('bsearch').style.display=showSearch?'flex':'none';
+  document.getElementById('content').style.paddingBottom=showSearch?'116px':'64px';
+  document.getElementById('filterBar').style.display=['branches','staff'].includes(t)?'flex':'none';
+  if(!silent)document.getElementById('content').scrollTop=0;
+}
+
+// SEARCH
+function handleSearch(){
+  sQ=document.getElementById('searchInput').value.trim().toLowerCase();
+  document.getElementById('bsClear').classList.toggle('show',sQ.length>0);
+  if(cTab==='branches')renderBranches();
+  else if(cTab==='staff')renderStaff();
+  else if(cTab==='ro')renderRO();
+  else if(cTab==='heads')renderHeads();
+}
+function clearSearch(){document.getElementById('searchInput').value='';sQ='';document.getElementById('bsClear').classList.remove('show');handleSearch()}
+function setFilter(f,el){cFilter=f;document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');if(cTab==='branches')renderBranches();if(cTab==='staff')renderStaff()}
+
+// STAFF ITEM with accordion contact
+let _siCounter=0;
+function staffItem(s,showBranch,prefix){
+  const hasMob=!!s.mobile,hasEmail=!!s.email;
+  const uid='si-'+(++_siCounter);
+  return`<div class="si" id="${uid}">
+    <div class="si-top" onclick="toggleContact('${uid}')">
+      <div class="sav ${dc(s.designation)}">${ini(s.name)}</div>
+      <div class="sinf">
+        <div class="sn">${s.name}${s.isBranchHead==='yes'?'<span class="hbadge">Head</span>':''}</div>
+        <div class="sd">${s.designation} · <span style="font-family:monospace;font-size:10px;color:var(--gr400)">#${s.staffNo}</span></div>
+        ${showBranch&&s.bn?`<span style="font-size:10px;color:var(--n3);background:#eff6ff;padding:2px 7px;border-radius:5px;font-weight:700;display:inline-block;margin-top:3px">${s.bn}</span>`:''}
+      </div>
+      ${(hasMob||hasEmail)?`<div class="si-chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>`:''}
+    </div>
+    ${(hasMob||hasEmail)?`<div class="si-contact">
+      ${hasMob?`<div class="contact-row">
+        <div class="contact-icon call">${cSvg}</div>
+        <div class="contact-detail">
+          <div class="contact-label">Mobile</div>
+          <div class="contact-value">${s.mobile}</div>
+        </div>
+        <button class="contact-btn call" onclick="callNum('${s.mobile}')">Call</button>
+      </div>`:''}
+      ${hasMob?`<div class="contact-row">
+        <div class="contact-icon wa">${wSvg}</div>
+        <div class="contact-detail">
+          <div class="contact-label">WhatsApp</div>
+          <div class="contact-value">${s.mobile}</div>
+        </div>
+        <button class="contact-btn wa" onclick="waNum('${s.mobile}')">Chat</button>
+      </div>`:''}
+      ${hasEmail?`<div class="contact-row">
+        <div class="contact-icon mail">${mSvg}</div>
+        <div class="contact-detail">
+          <div class="contact-label">Email</div>
+          <div class="contact-value" style="font-size:11px;word-break:break-all">${s.email}</div>
+        </div>
+        <button class="contact-btn mail" onclick="mailTo('${s.email}')">Mail</button>
+      </div>`:''}
+    </div>`:''}
+  </div>`;
+}
+
+function toggleContact(uid){
+  const el=document.getElementById(uid);
+  if(!el)return;
+  const isOpen=el.classList.contains('open');
+  document.querySelectorAll('.si.open').forEach(s=>s.classList.remove('open'));
+  if(!isOpen)el.classList.add('open');
+}
+
+// RENDER RO
+function renderRO(){_siCounter=0;
+  const rv=document.getElementById('roView');
+  let officials=[...DIRECTORY_DATA.roOfficials];
+  if(sQ)officials=officials.filter(o=>o.name.toLowerCase().includes(sQ)||o.designation.toLowerCase().includes(sQ)||o.section.toLowerCase().includes(sQ)||o.staffNo.includes(sQ));
+  const secs={};
+  officials.forEach(o=>{const s=(o.section&&o.section!=='No Section')?o.section:'Senior Leadership';if(!secs[s])secs[s]=[];secs[s].push(o)});
+  const order=['Senior Leadership'];Object.keys(secs).forEach(s=>{if(!order.includes(s))order.push(s)});
+  rv.innerHTML=`<div class="ro-hero"><div class="ro-hero-title">Bengaluru North Regional Office</div><div class="ro-hero-sub">${officials.length} officials · Tap name to view contacts</div></div>`+
+  order.filter(s=>secs[s]).map(sec=>`
+    <div class="ro-sec-hdr">${sec}</div>
+    <div style="background:#fff">${secs[sec].map(o=>staffItem({...o,isBranchHead:o.isBranchHead?'yes':'no'},false)).join('')}</div>`).join('');
+}
+
+// RENDER BRANCHES
+function renderBranches(){_siCounter=0;
+  const list=document.getElementById('branchList'),empty=document.getElementById('branchEmpty'),cnt=document.getElementById('branchCount');
+  let branches=[...DIRECTORY_DATA.branches];
+  if(sQ)branches=branches.filter(b=>b.name.toLowerCase().includes(sQ)||b.address.toLowerCase().includes(sQ)||b.staff.some(s=>s.name.toLowerCase().includes(sQ)||s.designation.toLowerCase().includes(sQ)||s.staffNo.includes(sQ)));
+  if(cFilter!=='all')branches=branches.filter(b=>b.staff.some(s=>s.designation===cFilter));
+  cnt.textContent=`${branches.length} branch${branches.length!==1?'es':''}`;
+  if(!branches.length){list.innerHTML='';empty.classList.add('show');return}
+  empty.classList.remove('show');
+  list.innerHTML=branches.map((b,i)=>{
+    const head=b.staff.find(s=>s.isBranchHead==='yes')||b.staff[0];
+    const cug=b.cugMobile||'';
+    const hasMap=!!COORDS[b.dpcd];
+    return`<div class="bcard" id="bc-${b.dpcd}" style="animation-delay:${Math.min(i*0.03,0.4)}s">
+      <div class="bc-hero" onclick="toggleBranch('${b.dpcd}')">
+        <div class="bc-glow1"></div><div class="bc-glow2"></div>
+        <div class="bc-top">
+          <div class="bc-dpcd">DPCD ${b.dpcd}</div>
+          ${b.ifsc?`<div class="bc-ifsc">${b.ifsc}</div>`:''}
+        </div>
+        <div class="bc-name">${b.name}</div>
+        ${b.address?`<div class="bc-addr">${b.address}</div>`:''}
+        <div class="bc-foot">
+          ${head?`<div class="bc-head-wrap">
+            <div class="bc-av ${dc(head.designation)}">${ini(head.name)}</div>
+            <div><div class="bc-hname">${head.name}</div><div class="bc-hdesg">${head.designation}</div></div>
+          </div>`:'<div></div>'}
+          <div class="bc-pills">
+            <div class="bc-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>${b.staff.length}</div>
+          </div>
+        </div>
+        <div class="bc-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+      </div>
+      ${(cug||hasMap)?`<div class="bc-cug">
+        ${cug?`<button class="act-btn call" onclick="callNum('${cug}')"><div class="aico">${cSvg}</div>CUG Call</button>`:''}
+        ${cug?`<button class="act-btn wa" onclick="waNum('${cug}')"><div class="aico">${wSvg}</div>WhatsApp</button>`:''}
+        ${hasMap?`<button class="act-btn map" onclick="openBranchMap('${b.dpcd}')"><div class="aico">${mpSvg}</div>Maps</button>`:''}
+      </div>`:''}
+      <div class="bc-staff">${b.staff.map(s=>staffItem(s,false)).join('')}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleBranch(dpcd){
+  const card=document.getElementById('bc-'+dpcd);if(!card)return;
+  const isOpen=card.classList.contains('open');
+  document.querySelectorAll('.bcard.open').forEach(c=>c.classList.remove('open'));
+  if(!isOpen){card.classList.add('open');setTimeout(()=>card.scrollIntoView({behavior:'smooth',block:'nearest'}),80)}
+}
+
+// RENDER STAFF
+function renderStaff(){_siCounter=0;
+  const list=document.getElementById('staffList'),empty=document.getElementById('staffEmpty'),cnt=document.getElementById('staffCount');
+  let all=[];DIRECTORY_DATA.branches.forEach(b=>b.staff.forEach(s=>all.push({...s,bn:b.name})));
+  if(sQ)all=all.filter(s=>s.name.toLowerCase().includes(sQ)||s.designation.toLowerCase().includes(sQ)||s.staffNo.includes(sQ)||s.bn.toLowerCase().includes(sQ));
+  if(cFilter!=='all')all=all.filter(s=>s.designation===cFilter);
+  all.sort((a,b)=>a.name.localeCompare(b.name));
+  cnt.textContent=`${all.length} staff member${all.length!==1?'s':''}`;
+  if(!all.length){list.innerHTML='';empty.classList.add('show');return}
+  empty.classList.remove('show');
+  // Wrap each in stc div with animation
+  list.innerHTML=all.map((s,i)=>`<div class="stc" style="animation-delay:${Math.min(i*0.018,0.5)}s">${staffItem(s,true,'st')}</div>`).join('');
+}
+
+// RENDER HEADS
+function renderHeads(){_siCounter=0;
+  const hv=document.getElementById('headsView');
+  // Branch heads
+  let branchHeads=[];
+  DIRECTORY_DATA.branches.forEach(b=>{
+    b.staff.filter(s=>s.isBranchHead==='yes').forEach(s=>branchHeads.push({...s,bn:b.name}));
+  });
+  if(sQ)branchHeads=branchHeads.filter(s=>s.name.toLowerCase().includes(sQ)||s.bn.toLowerCase().includes(sQ)||s.designation.toLowerCase().includes(sQ));
+  branchHeads.sort((a,b)=>a.bn.localeCompare(b.bn));
+
+  // RO section heads
+  let roHeads=[...DIRECTORY_DATA.roOfficials].filter(o=>o.isBranchHead&&o.isBranchHead.trim()!=='');
+  if(sQ)roHeads=roHeads.filter(o=>o.name.toLowerCase().includes(sQ)||o.designation.toLowerCase().includes(sQ));
+
+  let html=`<div class="hv-sec-hdr">Branch Heads <span class="hv-badge">${branchHeads.length}</span></div>
+    <div style="background:#fff">${branchHeads.map(s=>staffItem(s,true,'bh')).join('')}</div>`;
+
+  if(roHeads.length){
+    html+=`<div class="hv-sec-hdr" style="margin-top:8px">RO Section Heads <span class="hv-badge">${roHeads.length}</span></div>
+      <div style="background:#fff">${roHeads.map(o=>staffItem({...o,isBranchHead:'yes'},false,'rh')).join('')}</div>`;
+  }
+  hv.innerHTML=html;
+}
+
+// DISTANCE
+function hav(a,b,c,d){const R=6371,dL=(c-a)*Math.PI/180,dl=(d-b)*Math.PI/180,x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dl/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
+function findNearest(){
+  showToast('⚠️ Aerial estimates — road distance may vary');
+  const btn=document.getElementById('locBtn');
+  btn.style.opacity='0.7';btn.style.pointerEvents='none';
+  btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;animation:spin 1s linear infinite"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> Locating…';
+  if(!document.getElementById('ss')){const s=document.createElement('style');s.id='ss';s.textContent='@keyframes spin{to{transform:rotate(360deg)}}';document.head.appendChild(s)}
+  if(!navigator.geolocation){showToast('GPS not supported');resetLB();return}
+  navigator.geolocation.getCurrentPosition(pos=>{
+    myLL=[pos.coords.latitude,pos.coords.longitude];resetLB('📍 Refresh Location');
+    const d=document.getElementById('myLocDisplay');d.classList.add('show');
+    document.getElementById('myLocText').textContent=`${myLL[0].toFixed(4)}, ${myLL[1].toFixed(4)}`;
+    const res=[];DIRECTORY_DATA.branches.forEach(b=>{const c=COORDS[b.dpcd];if(c)res.push({b,dist:hav(myLL[0],myLL[1],c[0],c[1])})});
+    res.sort((a,b)=>a.dist-b.dist);
+    const nl=document.getElementById('nearbyList');nl.classList.add('show');
+    nl.innerHTML=res.slice(0,10).map((r,i)=>{
+      const rc=i===0?'g':i===1?'s':i===2?'b':'n';
+      const ds=r.dist<1?`${(r.dist*1000).toFixed(0)} m`:`${r.dist.toFixed(1)} km`;
+      return`<div class="nc" onclick="openBranchMap('${r.b.dpcd}')">
+        <div class="nrk ${rc}">${i+1}</div>
+        <div class="ninfo"><div class="nname">${r.b.name}</div><div class="ndist">📍 ${ds} away</div>${r.b.address?`<div class="naddr">${r.b.address}</div>`:''}</div>
+        <button class="nmap" onclick="event.stopPropagation();openBranchMap('${r.b.dpcd}')">${mpSvg}</button>
+      </div>`;
+    }).join('');
+    showToast(`${Math.min(res.length,10)} nearest branches found`);
+  },()=>{resetLB();showToast('Location denied. Please allow GPS.')},{timeout:10000,enableHighAccuracy:true});
+}
+function resetLB(t='Get My Location'){
+  const btn=document.getElementById('locBtn');btn.style.opacity='1';btn.style.pointerEvents='auto';
+  btn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 00-8 8c0 5.25 8 14 8 14s8-8.75 8-14a8 8 0 00-8-8z"/></svg> ${t}`;
+}
+function populateB2B(){
+  const f=document.getElementById('b2bFrom'),t=document.getElementById('b2bTo');
+  DIRECTORY_DATA.branches.forEach(b=>{if(COORDS[b.dpcd]){const o=`<option value="${b.dpcd}">${b.name}</option>`;f.innerHTML+=o;t.innerHTML+=o}});
+}
+function calcB2B(){
+  const fv=document.getElementById('b2bFrom').value,tv=document.getElementById('b2bTo').value;
+  if(!fv||!tv){showToast('Select both branches');return}
+  if(fv===tv){showToast('Select different branches');return}
+  const c1=COORDS[fv],c2=COORDS[tv];if(!c1||!c2){showToast('Coordinates not available');return}
+  b2bFC=c1;b2bTC=c2;
+  b2bFN=document.getElementById('b2bFrom').options[document.getElementById('b2bFrom').selectedIndex].text;
+  b2bTN=document.getElementById('b2bTo').options[document.getElementById('b2bTo').selectedIndex].text;
+  const d=hav(c1[0],c1[1],c2[0],c2[1]);
+  document.getElementById('b2bDist').textContent=d<1?`${(d*1000).toFixed(0)} m`:`${d.toFixed(2)} km`;
+  document.getElementById('b2bLabel').textContent=`${b2bFN} → ${b2bTN}`;
+  document.getElementById('b2bResult').classList.add('show');
+}
+function openMapsB2B(){if(!b2bFC||!b2bTC)return;window.open(`https://www.google.com/maps/dir/${b2bFC[0]},${b2bFC[1]}/${b2bTC[0]},${b2bTC[1]}`,'_blank')}
+function openBranchMap(d){const c=COORDS[d];if(!c){showToast('Location not available');return}window.open(`https://www.google.com/maps/search/?api=1&query=${c[0]},${c[1]}`,'_blank')}
+
+// ACTIONS
+function callNum(n){if(!n)return;window.location.href='tel:+91'+n.replace(/\D/g,'').slice(-10)}
+function waNum(n){if(!n)return;window.open('https://wa.me/91'+n.replace(/\D/g,'').slice(-10),'_blank')}
+function mailTo(e){if(!e)return;window.location.href='mailto:'+e}
+
+// TOAST
+let tt;function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2800)}
+
+// SW
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+</script></body></html>

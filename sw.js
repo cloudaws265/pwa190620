@@ -1,8 +1,8 @@
-const CACHE_NAME = 'canara-connect-shell-v2';
+const CACHE_NAME = 'canara-connect-shell-v3';
 const SHELL_ASSETS = [
   './manifest.json',
-  './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {

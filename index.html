@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Canara Connect">
 <link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>Canara Connect · North RO</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -393,7 +395,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
     <button class="sp-enter-btn" id="splashEnterBtn" onclick="dismissSplash()">Enter Directory →</button>
   </div>
   <div class="sp-disc"><p>⚠️ Compiled as on <strong>05-06-2026</strong>. Any changes on later date to be updated as and when required.</p></div>
-  <div class="sp-foot">Pawan Singh · RO North · Bengaluru<br><span style="opacity:0.6">Data as on 05-06-2026</span></div>
+  <div class="sp-foot"> Pawan Singh · RO North · Bengaluru<br><span style="opacity:0.6">Data as on 05-06-2026</span></div>
 </div>
 
 <!-- INSTALL POPUP -->
@@ -534,7 +536,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
         <div class="iv-about">
           <h3>📋 About & Disclaimer</h3>
           <div class="abox bl"><p>📅 <strong>Data compiled as on: 05-06-2026</strong><br>Any changes in staff, designations or mobile numbers after this date to be updated as and when required.</p></div>
-          <p style="font-size:11px;color:var(--gr500);text-align:center;margin-top:14px">Pawan Singh <strong>· RO North · Bengaluru</strong></p>
+          <p style="font-size:11px;color:var(--gr500);text-align:center;margin-top:14px"> <strong>Pawan Singh GA Section · RO North · Bengaluru</strong></p>
           <p style="text-align:center;margin-top:10px"><a href="admin.html" style="color:var(--gr300);font-size:10px;text-decoration:none;border-bottom:1px dotted var(--gr300);letter-spacing:0.3px">⚙ Admin Login</a></p>
         </div>
       </div>
@@ -919,5 +921,5 @@ function mailTo(e){if(!e)return;window.location.href='mailto:'+e}
 let tt;function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2800)}
 
 // SW
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(err=>console.error('SW registration failed:',err))}
 </script></body></html>
